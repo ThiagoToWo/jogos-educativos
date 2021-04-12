@@ -1,0 +1,370 @@
+<!doctype html>
+<html>
+<head>
+	<title>Lançamento de projéteis</title>
+	<meta name='viewport' content='width=device-width initial-scale=1'/>
+	<meta charset='utf-8'/>
+	<script>
+		var canvas;
+		var ctx;
+		var x_0 = 10;
+		var y_0 = 440;		
+		var acao;
+		var mouse_x;
+		var mouse_y;
+		var mouse_move = false;
+		var grav = 2;
+		var y_max;
+		var x_max;
+		var t_ar;
+		var bala;
+		var chao;
+		var seta;
+		var tudo = [];
+		
+		function Bala(x, y, r, cor) {
+			this.x = x;
+			this.y = y;
+			this.r = r;
+			this.vx = 0;
+			this.vy_inicial = 0;
+			this.vy_final = 0;
+			this.cor = cor;
+			this.seta = seta;
+			this.trajetoria = [[this.x, this.y]];
+			this.trajetoria_ativada = true;
+			
+			this.atualizar = function() {
+				var dx = this.vx;
+				this.vy_final = this.vy_inicial + grav;
+				var dy = (this.vy_inicial + this.vy_final)/ 2;
+				this.vy_inicial = this.vy_final;
+				
+				this.x += dx;
+				this.y += dy;
+				
+				this.trajetoria.push([this.x, this.y]);
+			}
+			this.desenhar = function() {
+				ctx.fillStyle = this.cor;
+				ctx.beginPath();
+				ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+				ctx.fill();
+			}
+			this.desenharTrajetoria = function() {
+				if (!this.trajetoria_ativada) return;
+				
+				ctx.fillStyle = this.cor;
+				ctx.save();
+								
+				for (var i in this.trajetoria) {					
+					ctx.beginPath();
+					ctx.arc(this.trajetoria[i][0], this.trajetoria[i][1], 2, 0, 2 * Math.PI);
+					ctx.fill();
+				}
+				
+				ctx.restore();
+			}
+		}
+		
+		function Retangulo(x, y, w, h, cor) {
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+			this.cor = cor;
+			
+			this.atualizar = function(dx, dy) {
+				
+			}
+			this.desenhar = function() {
+				ctx.fillStyle = this.cor;
+				ctx.fillRect(this.x, this.y, this.w, this.h);
+			}
+		}
+
+		function Seta(origem, cor) {
+			this.o = origem;
+			this.x = 0;
+			this.y = 0;
+			this.w = 0;
+			this.h = 0;
+			this.ang_rad = 0;
+			this.ang_grau = 0;
+			this.ponta_x = 0;
+			this.ponta_y = 0;	
+			this.cor = cor;
+			this.ativada = false;
+			
+			this.atualizar = function() {
+				this.x = this.o.x;
+				this.y = this.o.y - this.o.r / 2;
+				this.w = 2 * Math.sqrt(this.o.vx**2 + this.o.vy_inicial**2);
+				this.h = this.o.r;
+				this.ang_rad = Math.atan(this.o.vy_inicial / this.o.vx);
+				this.ang_grau = this.ang_rad * 180 / Math.PI;
+				this.ponta_x = this.x + this.w + 2 * this.h;
+				this.ponta_y = this.y + this.h / 2;
+			}
+			this.desenhar = function() {
+				if (!this.ativada) return;				
+				
+				ctx.save();
+				ctx.translate(this.x, this.y  + this.h / 2);
+				ctx.rotate(this.ang_rad);
+				ctx.translate(-this.x, -this.y  - this.h / 2);
+				ctx.fillStyle = this.cor;
+				ctx.fillRect(this.x, this.y, this.w, this.h);
+				
+				ctx.beginPath();
+				ctx.moveTo(
+					this.x + this.w,
+					this.y - this.h / 2					
+				)
+				ctx.lineTo( // ponta da seta
+					this.ponta_x,
+					this.ponta_y					
+				)
+				ctx.lineTo(
+					this.x + this.w,
+					this.y + 3 * this.h / 2					
+				)
+				ctx.closePath();
+				ctx.fill();
+				ctx.restore();
+			}
+			this.mostrarValores = function() {
+				ctx.font = 'bold 20px sans-serif';
+				ctx.fillText('Velocidade inicial: ' + Number(this.w / 2).toFixed(0) + 'm/s', 10, 26);
+				ctx.fillText('Ângulo: ' + Math.abs(Number(this.ang_grau)).toFixed(0) + '°', 10, 46);
+				ctx.fillText('Velocidade horizontal: ' + bala.vx + 'm/s', 10, 66);
+				ctx.fillText('Velocidade vertical: ' + Math.abs(bala.vy_inicial) + 'm/s', 10,86);
+			}
+		}
+		
+		function main() {
+			canvas = document.getElementById('canvas');
+			ctx = canvas.getContext('2d');
+			canvas.addEventListener('mousedown', acharBola);
+			canvas.addEventListener('mousemove', moverSeta);
+			canvas.addEventListener('mouseup', atirarComSeta);
+			
+			bala = new Bala(x_0, y_0, 10, 'black');			
+			
+			chao = new Retangulo(0, 450, canvas.width, 50, 'green');
+			seta = new Seta(bala, 'red');			
+			var nuvem1 = new Retangulo(100, 80, 200, 30, 'white');
+			var nuvem2 = new Retangulo(20, 100, 500, 30, 'white');
+			var nuvem3 = new Retangulo(800, 10, 100, 20, 'white');
+			var nuvem4 = new Retangulo(750, 120, 600, 40, 'white');
+			
+			tudo.push(chao);
+			tudo.push(nuvem1);
+			tudo.push(nuvem2);
+			tudo.push(nuvem3);
+			tudo.push(nuvem4);			
+			tudo.push(bala);
+			tudo.push(seta);
+			
+			desenharTudo();
+		}
+		
+		function desenharTudo() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			
+			for (var i in tudo) {
+				tudo[i].desenhar();
+			}			
+			
+			bala.desenharTrajetoria();
+		}
+		
+		function acharBola(e) {			
+			configurarMouse(e);
+			
+			var distsqr = (mouse_x - bala.x)**2 + (mouse_y - bala.y)**2;
+			
+			if (distsqr < (bala.r)**2) {
+				mouse_move = true;
+				seta.ativada = true;
+				seta.atualizar();
+				desenharTudo();
+			}
+		}
+		
+		function moverSeta(e) {			
+			if (mouse_move) {
+				configurarMouse(e);
+				
+				var vx = Math.abs(mouse_x - bala.x);
+				var vy = Math.abs(mouse_y - bala.y);				
+				
+				bala.vx = vx;
+				bala.vy_inicial = -vy;
+				
+				seta.atualizar();
+				
+				desenharTudo();				
+				
+				seta.mostrarValores();
+				
+				y_max = vy**2 / 19.6;
+				t_ar = 2 * vy / 9.8;
+				x_max = vx * t_ar;
+			}			
+		}
+		
+		function configurarMouse(e) {
+			if (e.layerX || e.layerX == 0) {
+				mouse_x = e.layerX;
+				mouse_y = e.layerY;
+			} else if (e.offsetX || e.offsetX == 0) {
+				mouse_x = e.offsetX;
+				mouse_y = e.offsetY;
+			}
+		}
+		
+		function atirarComSeta() {
+			if (mouse_move) {
+				mouse_move = false;
+				
+				acao = setInterval(processar, 100);
+			}			
+		}
+		
+		function atirar() {
+			visual()
+			
+			acao = setInterval(processar, 100);
+			
+			return false;
+		}
+		
+		function visual() {
+			bala.x = x_0;
+			bala.y = y_0;			
+			
+			if (f1.vx.value > 36 || f1.vx.value < 0) {
+				alert("A velocidade horizontal deve ser de 0 a 36");
+				return;
+			}
+			
+			if (f1.vy.value > 41 || f1.vy.value < 0) {
+				alert("A velocidade vertical deve ser de 0 a 41");
+				return;
+			}			
+			
+			var vx = Number(f1.vx.value);
+			var vy = Number(f1.vy.value);
+			
+			configurarValores(vx, vy);	
+			
+			desenharTudo();
+		}
+		
+		function atirarComAng() {
+			visualComAng();
+			
+			acao = setInterval(processar, 100);
+			
+			return false;
+		}
+		
+		function visualComAng() {
+			bala.x = x_0;
+			bala.y = y_0;
+			
+			if (f2.v0.value > 54 || f2.v0.value < 0) {
+				alert("A velocidade deve ser de 0 a 55");
+				return;
+			}
+			
+			if (f2.ang.value > 90 || f2.ang.value < 0) {
+				alert("O ângulo deve ser de 0° a 90°");
+				return;
+			}			
+				
+			var ang = Number(f2.ang.value) * Math.PI / 180;
+			var vx = Math.round(Number(f2.v0.value) * Math.cos(ang));
+			var vy = Math.round(Number(f2.v0.value) * Math.sin(ang));
+			
+			configurarValores(vx, vy);			
+			
+			desenharTudo();
+		}		
+		
+		function configurarValores(vx, vy) {
+			bala.vx = vx;
+			bala.vy_inicial = -vy;
+			
+			seta.ativada = true;
+			seta.atualizar();
+			
+			y_max = vy**2 / 19.6;
+			t_ar = 2 * vy / 9.8;
+			x_max = vx * t_ar;
+		}
+		
+		function processar() {
+			bala.atualizar();
+			seta.atualizar();
+			
+			if (bala.y + bala.r >= chao.y) {				
+				clearInterval(acao);				
+			
+				desenharTudo();
+				
+				seta.mostrarValores();
+				mostrarResultados();
+			} else {
+				desenharTudo();
+			}
+		}
+		
+		function mostrarResultados() {
+			ctx.font = 'bold 20px sans-serif';
+			ctx.fillText('Altura máxima: ' + y_max.toFixed(0) + 'm', 10, 160);
+			ctx.fillText('Alcance horizontal: ' + x_max.toFixed(0) + 'm', 10, 180);
+			ctx.fillText('Tempo no ar: ' + t_ar.toFixed(0) + 's', 10, 200);
+		}
+	</script>
+	<style>
+		canvas {background: skyblue;}
+		form {
+			width:330px;
+			margin:20px;
+			background: brown;
+			padding: 20px;
+			display: inline-table;
+		}
+		input:valid {background: green;}
+		input:invalid {background: red;}		
+	</style>
+</head>
+<body onLoad='main();'>
+	<canvas id='canvas' width='1500' height='500'></canvas>
+	<br/>
+	<form>
+		<p>Clique e segure o botão esquerdo do mouse sobre a bola e arraste para configurar o ângulo e a velocidade de lançamento. Solte o botão para atirar.<p/>
+		<p>Reinicie a página para tentar novamente ou configure e visualize atráves de umas das entradas de formulário.<p/>
+	</form>
+	<form name='f1' onSubmit='return atirar();'>
+		Velocidade horizontal: <input name='vx' type='number' value='20' min='0' max='36'/>m/s
+		<br/>
+		Velocidade vertical: <input name='vy' type='number' value='25' min='0' max='41'/>m/s
+		<br/>
+		<input type='button' value='Visualizar' onClick='visual();'/>
+		<br/>
+		<input type='submit' value='Atirar'/>
+	</form>
+	<form name='f2' onSubmit='return atirarComAng();'>
+		Velocidade inicial: <input name='v0' type='number' value='20' min='0' max='54'/>m/s
+		<br/>
+		Ângulo: <input name='ang' type='number' value='45' min='0' max='90'/>°
+		<br/>
+		<input type='button' value='Visualizar' onClick='visualComAng();'/>
+		<br/>
+		<input type='submit' value='Atirar'/>
+	</form>
+</body>
+</html>
