@@ -14,9 +14,13 @@
 		var mouse_y;
 		var mouse_move = false;
 		var grav = 2;
+		var v0;
+		var vx_0;
+		var vy_0;
 		var y_max;
 		var x_max;
 		var t_ar;
+		var ang_grau;
 		var bala;
 		var chao;
 		var seta;
@@ -102,7 +106,6 @@
 				this.w = 2 * Math.sqrt(this.o.vx**2 + this.o.vy_inicial**2);
 				this.h = this.o.r;
 				this.ang_rad = Math.atan(this.o.vy_inicial / this.o.vx);
-				this.ang_grau = this.ang_rad * 180 / Math.PI;
 				this.ponta_x = this.x + this.w + 2 * this.h;
 				this.ponta_y = this.y + this.h / 2;
 			}
@@ -132,14 +135,7 @@
 				ctx.closePath();
 				ctx.fill();
 				ctx.restore();
-			}
-			this.mostrarValores = function() {
-				ctx.font = 'bold 20px sans-serif';
-				ctx.fillText('Velocidade inicial: ' + Number(this.w / 2).toFixed(0) + 'm/s', 10, 26);
-				ctx.fillText('Ângulo: ' + Math.abs(Number(this.ang_grau)).toFixed(0) + '°', 10, 46);
-				ctx.fillText('Velocidade horizontal: ' + bala.vx + 'm/s', 10, 66);
-				ctx.fillText('Velocidade vertical: ' + Math.abs(bala.vy_inicial) + 'm/s', 10,86);
-			}
+			}			
 		}
 		
 		function main() {
@@ -196,21 +192,24 @@
 			if (mouse_move) {
 				configurarMouse(e);
 				
-				var vx = Math.abs(mouse_x - bala.x);
-				var vy = Math.abs(mouse_y - bala.y);				
+				vx_0 = Math.abs(mouse_x - bala.x);
+				vy_0 = Math.abs(mouse_y - bala.y);
+				v0 = Math.sqrt(vx_0 * vx_0 + vy_0 * vy_0);
+				ang_grau = Math.atan(vy_0 / vx_0) * 180 / Math.PI;			
 				
-				bala.vx = vx;
-				bala.vy_inicial = -vy;
+				bala.vx = vx_0;
+				bala.vy_inicial = -vy_0;				
 				
+				seta.ang_grau = ang_grau;
 				seta.atualizar();
 				
 				desenharTudo();				
 				
-				seta.mostrarValores();
+				mostrarValores();
 				
-				y_max = vy**2 / 19.6;
-				t_ar = 2 * vy / 9.8;
-				x_max = vx * t_ar;
+				y_max = vy_0**2 / 19.6;
+				t_ar = 2 * vy_0 / 9.8;
+				x_max = vx_0 * t_ar;
 			}			
 		}
 		
@@ -254,10 +253,12 @@
 				return;
 			}			
 			
-			var vx = Number(f1.vx.value);
-			var vy = Number(f1.vy.value);
+			vx_0 = Number(f1.vx.value);
+			vy_0 = Number(f1.vy.value);	
+			v0 = Math.sqrt(vx_0 * vx_0 + vy_0 * vy_0);
+			ang_grau = Math.atan(vy_0 / vx_0) * 180 / Math.PI;
 			
-			configurarValores(vx, vy);	
+			configurarValores();	
 			
 			desenharTudo();
 		}
@@ -283,26 +284,29 @@
 				alert("O ângulo deve ser de 0° a 90°");
 				return;
 			}			
-				
-			var ang = Number(f2.ang.value) * Math.PI / 180;
-			var vx = Math.round(Number(f2.v0.value) * Math.cos(ang));
-			var vy = Math.round(Number(f2.v0.value) * Math.sin(ang));
 			
-			configurarValores(vx, vy);			
+			ang_grau = Number(f2.ang.value);
+			var ang = ang_grau * Math.PI / 180;
+			vx_0 = Number(f2.v0.value) * Math.cos(ang);
+			vy_0 = Number(f2.v0.value) * Math.sin(ang);
+			v0 = Math.sqrt(vx_0 * vx_0 + vy_0 * vy_0);
+			
+			configurarValores();			
 			
 			desenharTudo();
 		}		
 		
-		function configurarValores(vx, vy) {
-			bala.vx = vx;
-			bala.vy_inicial = -vy;
+		function configurarValores() {
+			bala.vx = vx_0;
+			bala.vy_inicial = -vy_0;
 			
 			seta.ativada = true;
+			seta.ang_grau = ang_grau;
 			seta.atualizar();
 			
-			y_max = vy**2 / 19.6;
-			t_ar = 2 * vy / 9.8;
-			x_max = vx * t_ar;
+			y_max = vy_0**2 / 19.6;
+			t_ar = 2 * vy_0 / 9.8;
+			x_max = vx_0 * t_ar;
 		}
 		
 		function processar() {
@@ -313,12 +317,19 @@
 				clearInterval(acao);				
 			
 				desenharTudo();
-				
-				seta.mostrarValores();
+				mostrarValores();
 				mostrarResultados();
 			} else {
 				desenharTudo();
 			}
+		}
+		
+		function mostrarValores() {
+			ctx.font = 'bold 20px sans-serif';
+			ctx.fillText('Velocidade inicial: ' + v0.toFixed(2) + 'm/s', 10, 26);
+			ctx.fillText('Ângulo: ' + ang_grau.toFixed(2) + '°', 10, 46);
+			ctx.fillText('Velocidade horizontal: ' + vx_0.toFixed(2) + 'm/s', 10, 66);
+			ctx.fillText('Velocidade vertical: ' + vy_0.toFixed(2) + 'm/s', 10,86);
 		}
 		
 		function mostrarResultados() {
