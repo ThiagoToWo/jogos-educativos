@@ -89,7 +89,15 @@
 			this.desenhar = function() {
 				if (!this.ativado) return;
 				
-				new Retangulo(this.x, this.y, this.w, this.h, this.cor).desenhar();
+				if (this.atingido) {
+					new Retangulo(this.x - 22, this.y + 22, 3 * this.w, this.h / 3, this.cor).desenhar();	
+				} else {				
+					new Retangulo(this.x, this.y, this.w, this.h, this.cor).desenhar();
+					ctx.save();
+					ctx.lineWidth = 5;
+					ctx.strokeRect(this.x, this.y, this.w, this.h);
+					ctx.restore();
+				}
 			}
 			this.mostrarObjetivo = function() {
 				ctx.save();
@@ -97,7 +105,7 @@
 				ctx.font = 'bold 20px sans-serif';
 				ctx.fillText(
 					'Me acerte: ' + this.meio / PPM + 'm', 
-					this.x,
+					this.x - 70,
 					this.y + this.h + 20
 				);
 				ctx.restore();
@@ -182,10 +190,10 @@
 			seta = new Seta(bala, 'red');
 			chao = new Retangulo(0, 450, canvas.width, 50, 'green');
 			
-			var h_alvo = 10;
-			var w_alvo = 100;
+			var h_alvo = 33;
+			var w_alvo = 33;
 			var y_alvo = chao.y - h_alvo;
-			var x_alvo = 200 + Math.floor(Math.random() * (canvas.width - w_alvo - 200));
+			var x_alvo = 200 + Math.floor(Math.random() * (canvas.width - 300));
 			
 			alvo = new Alvo(x_alvo, y_alvo, w_alvo, h_alvo, 'purple');	
 						
@@ -353,60 +361,79 @@
 		
 		function processar() {
 			bala.atualizar();
-			seta.atualizar();
+			seta.atualizar();					
+			
+			desenharTudo();	
+			
+			if (colidiuComAlvo()) {				
+				alvo.atingido = true;
+				seta.ativada = false;
+				desenharTudo();
+			} 
 			
 			if (bala.y + bala.r >= chao.y) {				
 				clearInterval(acao);
 				desenharTudo();
 				mostrarValores();
 				mostrarResultados();
-			} else if (colidiuComAlvo()) {
-				alvo.atingido = true;				
-				clearInterval(acao);
-				desenharTudo();
-				mostrarValores();
-				mostrarResultados();
-			} else {
-				desenharTudo();
-			}
+			}		
 		}
 		
 		function colidiuComAlvo() {
-			var bx = bala.x - bala.r;
-			var by = bala.y - bala.r;
-			var bw = bh = 2 * bala.r;
+			var bx = bala.x;
+			var by = bala.y;
+			var bw = bala.r;
+			var bh = bala.r;
 			
-			return bx + bw > alvo.x &&
-				bx  < alvo.x + alvo.w &&
-				by + bh > alvo.y &&
-				by > alvo.y + alvo.h;
+			return (bx + bw>= alvo.x) &&
+				(bx <= alvo.x + alvo.w) &&
+				(by + bh >= alvo.y) &&
+				(by <= alvo.y + alvo.h);
 		}
 		function mostrarValores() {
+			var x = 10;
+			var y = 26;
+			var size = 20;
+			
 			ctx.font = 'bold 20px sans-serif';
-			ctx.fillText('Velocidade inicial: ' + v0.toFixed(2) + 'm/s', 10, 26);
-			ctx.fillText('Ângulo: ' + ang_grau.toFixed(2) + '°', 10, 46);
-			ctx.fillText('Velocidade horizontal: ' + vx_0.toFixed(2) + 'm/s', 10, 66);
-			ctx.fillText('Velocidade vertical: ' + vy_0.toFixed(2) + 'm/s', 10,86);
+			ctx.fillText('Velocidade inicial: ' + v0.toFixed(2) + 'm/s', x, y);
+			ctx.fillText('Ângulo: ' + ang_grau.toFixed(2) + '°', x, y + size);
+			ctx.fillText('Velocidade horizontal: ' + vx_0.toFixed(2) + 'm/s', x, y + 2 * size);
+			ctx.fillText('Velocidade vertical: ' + vy_0.toFixed(2) + 'm/s', x,y + 3 * size);
 		}
 		
 		function mostrarResultados() {
+			var x = 1250;
+			var y = 26;			
+			var size = 20;
+			
 			ctx.font = 'bold 20px sans-serif';
-			ctx.fillText('Altura máxima: ' + y_max.toFixed(0) + 'm', 10, 160);
-			ctx.fillText('Alcance horizontal: ' + x_max.toFixed(0) + 'm', 10, 180);
-			ctx.fillText('Tempo no ar: ' + t_ar.toFixed(0) + 's', 10, 200);
+			ctx.fillText('Altura máxima: ' + y_max.toFixed(0) + 'm', x, y);
+			ctx.fillText('Alcance horizontal: ' + x_max.toFixed(0) + 'm', x, y + size);
+			ctx.fillText('Tempo no ar: ' + t_ar.toFixed(0) + 's', x, y + 2 * size);
 		}
 	</script>
 	<style>
 		canvas {background: skyblue;}
 		form {
-			width:330px;
+			width:410px;
 			margin:20px;
 			background: brown;
 			padding: 20px;
 			display: inline-table;
 		}
 		input:valid {background: green;}
-		input:invalid {background: red;}		
+		input:invalid {background: red;}
+		article {
+			text-align: left;
+			margin: 10px;
+			border: 5px green double;
+			padding-left: 10px;
+			display: inline-table;
+		}		
+		#formulas{width: ;}
+		#exemplo1{width: ;}
+		#exemplo2{width: 450px;}
 	</style>
 </head>
 <body onLoad='main();'>
@@ -434,5 +461,46 @@
 		<br/>
 		<input type='submit' value='Atirar'/>
 	</form>
+	<article id='formulas'>
+		<h3>Experimente calcular.</h3>	
+		<p>Velocidade inicial: v<sub>0</sub><p/>
+		<p>Ângulo de lançamento: &alpha;<p/>
+		<br/>
+		<p>Velocidade horizontal: v<sub>x0</sub> = v<sub>0</sub> . cos &alpha;<p/>
+		<p>Velocidade vertical: v<sub>y0</sub> = v<sub>0</sub> . sen &alpha;<p/>
+		<br/>
+		<p>Altura máxima: y<sub>max</sub> = (v<sub>y0</sub>)<sup>2</sup> / (2g)<p/>
+		<p>Tempo no ar: t<sub>ar</sub> = 2 . (v<sub>y0</sub> / g)<p/>
+		<p>Alcance horizontal: x<sub>max</sub> = v<sub>x0</sub> . t<sub>ar</sub><p/>
+	</article>
+	<article id='exemplo1'>
+		<h3>Exemplo 1.</h3>	
+		Dados:
+		<p>Velocidade inicial: 30m/s<p/>
+		<p>Ângulo de lançamento: 53°<p/>
+		<br/>
+		<p>Velocidade horizontal: v<sub>x0</sub> = 30 . cos 53° = 18,05m/s<p/>
+		<p>Velocidade vertical: v<sub>y0</sub> = 30 . sen 53° = 23,96m/s<p/>
+		<br/>	
+		<p>Altura máxima: y<sub>max</sub> = (23,96)² / (2 . 9,8) = 29,3m<p/>
+		<p>Tempo no ar: t<sub>ar</sub> = 2 . (23,96 / 9,8) = 4,9s<p/>
+		<p>Alcance horizontal: x<sub>max</sub> = 18,05 . 4,9 = 88,4m<p/>
+	</article>
+	<article id='exemplo2'>
+		<h3>Exemplo 2.</h3>	
+		Dados:
+		<p>Alcance horizontal: 90m<p/>
+		<br/>
+		<p>Escolha um valor qualquer para v<sub>x0</sub>, digamos 30m/s.<p/>
+		<br/>
+		<p>De x<sub>max</sub> = v<sub>x0</sub> . t<sub>ar</sub>, temos que<br/>
+		98 = 30 . t<sub>ar</sub><br/>
+		t<sub>ar</sub> = 90 / 30 = 3s</p>
+		<br/>
+		<p>De t<sub>ar</sub> = 2 . (v<sub>y0</sub> / g), temos<br/>
+		3 = 2 . (v<sub>y0</sub> / 9,8)<br/>
+		v<sub>y0</sub> = 3 . 9,8 / 2 = 14,7m/s</p>
+		<p> Portanto v<sub>x0</sub> = 30m/s e v<sub>y0</sub> = 15m/s acertam um alvo a 90m</p>
+	</article>
 </body>
 </html>
