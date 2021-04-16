@@ -428,7 +428,7 @@
 			text-align: left;
 			margin: 10px;
 			border: 5px green double;
-			padding-left: 10px;
+			padding: 10px;
 			display: inline-table;
 		}		
 		#formulas{width: ;}
@@ -437,6 +437,14 @@
 	</style>
 </head>
 <body onLoad='main();'>
+	<h1>Simulador de Lançamento de Projéteis</h1>
+	<article>
+		<ul>
+		<li>Simule o lançamento de um projétil despresando a resistência do ar.</li>
+		<li>Use o mouse ou as entradas dos formulários para ajustar os parêmetros iniciais de tiro.</li>
+		<li>Faça os cálculos e tente acertar o alvo onde ele aparecer. Não sabe como calcular? Olhe os exemplos no fim da página e não desperdice munição.</li>
+		</ul>
+	</article>
 	<canvas id='canvas' width='1500' height='500'></canvas>
 	<br/>
 	<form>
@@ -466,12 +474,12 @@
 		<p>Velocidade inicial: v<sub>0</sub><p/>
 		<p>Ângulo de lançamento: &alpha;<p/>
 		<br/>
-		<p>Velocidade horizontal: v<sub>x0</sub> = v<sub>0</sub> . cos &alpha;<p/>
-		<p>Velocidade vertical: v<sub>y0</sub> = v<sub>0</sub> . sen &alpha;<p/>
+		<p>Velocidade horizontal: v<sub>0x</sub> = v<sub>0</sub> . cos &alpha;<p/>
+		<p>Velocidade vertical: v<sub>0y</sub> = v<sub>0</sub> . sen &alpha;<p/>
 		<br/>
-		<p>Altura máxima: y<sub>max</sub> = (v<sub>y0</sub>)<sup>2</sup> / (2g)<p/>
-		<p>Tempo no ar: t<sub>ar</sub> = 2 . (v<sub>y0</sub> / g)<p/>
-		<p>Alcance horizontal: x<sub>max</sub> = v<sub>x0</sub> . t<sub>ar</sub><p/>
+		<p>Altura máxima: y<sub>max</sub> = (v<sub>0y</sub>)<sup>2</sup> / (2g)<p/>
+		<p>Tempo no ar: t<sub>ar</sub> = 2v<sub>0y</sub> / g<p/>
+		<p>Alcance horizontal: x<sub>max</sub> = v<sub>0x</sub> . t<sub>ar</sub><p/>
 	</article>
 	<article id='exemplo1'>
 		<h3>Exemplo 1.</h3>	
@@ -479,11 +487,11 @@
 		<p>Velocidade inicial: 30m/s<p/>
 		<p>Ângulo de lançamento: 53°<p/>
 		<br/>
-		<p>Velocidade horizontal: v<sub>x0</sub> = 30 . cos 53° = 18,05m/s<p/>
-		<p>Velocidade vertical: v<sub>y0</sub> = 30 . sen 53° = 23,96m/s<p/>
+		<p>Velocidade horizontal: v<sub>0x</sub> = 30 . cos 53° = 18,05m/s<p/>
+		<p>Velocidade vertical: v<sub>0y</sub> = 30 . sen 53° = 23,96m/s<p/>
 		<br/>	
 		<p>Altura máxima: y<sub>max</sub> = (23,96)² / (2 . 9,8) = 29,3m<p/>
-		<p>Tempo no ar: t<sub>ar</sub> = 2 . (23,96 / 9,8) = 4,9s<p/>
+		<p>Tempo no ar: t<sub>ar</sub> = 2 . 23,96 / 9,8 = 4,9s<p/>
 		<p>Alcance horizontal: x<sub>max</sub> = 18,05 . 4,9 = 88,4m<p/>
 	</article>
 	<article id='exemplo2'>
@@ -491,16 +499,16 @@
 		Dados:
 		<p>Alcance horizontal: 90m<p/>
 		<br/>
-		<p>Escolha um valor qualquer para v<sub>x0</sub>, digamos 30m/s.<p/>
+		<p>Escolha um valor qualquer para v<sub>0x</sub>, digamos 30m/s.<p/>
 		<br/>
-		<p>De x<sub>max</sub> = v<sub>x0</sub> . t<sub>ar</sub>, temos que<br/>
+		<p>De x<sub>max</sub> = v<sub>0x</sub> . t<sub>ar</sub>, temos que<br/><br/>
 		98 = 30 . t<sub>ar</sub><br/>
 		t<sub>ar</sub> = 90 / 30 = 3s</p>
 		<br/>
-		<p>De t<sub>ar</sub> = 2 . (v<sub>y0</sub> / g), temos<br/>
-		3 = 2 . (v<sub>y0</sub> / 9,8)<br/>
-		v<sub>y0</sub> = 3 . 9,8 / 2 = 14,7m/s</p>
-		<p> Portanto v<sub>x0</sub> = 30m/s e v<sub>y0</sub> = 15m/s acertam um alvo a 90m</p>
+		<p>De t<sub>ar</sub> = 2v<sub>0y</sub> / g, temos<br/><br/>
+		3 = 2 . v<sub>0y</sub> / 9,8<br/>
+		v<sub>0y</sub> = 3 . 9,8 / 2 = 14,7m/s</p>
+		<p> Portanto v<sub>0x</sub> = 30m/s e v<sub>0y</sub> = 15m/s acertam um alvo a 90m</p>
 	</article>
 </body>
 </html>
