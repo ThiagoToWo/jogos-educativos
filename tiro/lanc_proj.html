@@ -308,9 +308,11 @@
 			v0 = Math.sqrt(vx_0 * vx_0 + vy_0 * vy_0);
 			ang_grau = Math.atan(vy_0 / vx_0) * 180 / Math.PI;
 			
-			configurarValores();	
+			configurarValores();
 			
 			desenharTudo();
+			
+			mostrarValores();
 		}
 		
 		function atirarComAng() {
@@ -344,6 +346,8 @@
 			configurarValores();			
 			
 			desenharTudo();
+			
+			mostrarValores();
 		}		
 		
 		function configurarValores() {
@@ -363,7 +367,7 @@
 			bala.atualizar();
 			seta.atualizar();					
 			
-			desenharTudo();	
+			desenharTudo();
 			
 			if (colidiuComAlvo()) {				
 				alvo.atingido = true;
@@ -390,6 +394,7 @@
 				(by + bh >= alvo.y) &&
 				(by <= alvo.y + alvo.h);
 		}
+		
 		function mostrarValores() {
 			var x = 10;
 			var y = 26;
