@@ -1,0 +1,214 @@
+<!doctype html>
+<html>
+<head>
+	<title>Jogo da Memória</title>
+	<meta name='viewport' content='width=device-width initial-scale=1'/>
+	<meta charset='utf-8'/>
+	<script>
+		var canvas;
+		var ctx;
+		var jogo_t0;
+		var carta_x0 = 30;
+		var carta_y0 = 50;
+		var carta_r = 30;
+		var carta_w = 4 * carta_r;
+		var carta_h = 4 * carta_r;
+		var margem = 30;
+		var deck = [];
+		var primeiraEscolha = true;
+		var primeiraCarta;
+		var segundaCarta;
+		var combinou;
+		var combinacoes = 0;
+		
+		function Carta(x, y, w, h, info) {
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+			this.info = info;
+			
+			this.desenharCostas = function() {
+				ctx.save();
+				ctx.fillStyle = 'purple';
+				ctx.fillRect(this.x, this.y, this.w, this.h);
+				ctx.restore();
+			}
+		}		
+		
+		function Poligono(x, y, r, n) {
+			this.x = x;
+			this.y = y;
+			this.r = r;
+			this.n = n;
+			this.ang_central = 2 * Math.PI / n;
+			
+			this.desenhar = function() {
+				ctx.save();
+				ctx.fillStyle = 'yellow';
+				ctx.fillRect(
+					this.x - 2 * this.r, 
+					this.y - 2 * this.r, 
+					4 * this.r, 
+					4 * this.r
+				);
+				
+				ctx.beginPath();
+				ctx.fillStyle = 'red';
+			
+				ctx.moveTo(
+					this.x + this.r * Math.cos((- 0.5) * this.ang_central),
+					this.y + this.r * Math.sin((- 0.5) * this.ang_central)
+				);
+				
+				for (var i = 1; i < this.n; i++) {
+					ctx.lineTo(
+						this.x + this.r * Math.cos((i - 0.5) * this.ang_central),
+						this.y + this.r * Math.sin((i - 0.5) * this.ang_central)
+					);
+				}
+				ctx.fill();
+				
+				ctx.restore();
+			}
+		}
+
+		function init() {		
+			canvas = document.getElementById('canvas');
+			ctx = canvas.getContext('2d');
+			canvas.addEventListener('click', escolher, false);
+			fazerDeck();
+			jogo_t0 = new Date().getTime();
+			embaralhar();
+		} 
+	
+		function fazerDeck() {
+			var carta1;
+			var carta2;
+			
+			var cx = carta_x0;
+			var cy = carta_y0;
+			
+			for (var i = 3; i < 9; i++) {
+				carta1 = new Carta(cx, cy, carta_w, carta_h, i);
+				deck.push(carta1);
+				carta2 = new Carta(cx, cy + carta_h + margem, carta_w, carta_h, i);
+				deck.push(carta2);
+				
+				cx += carta_w + margem;
+				
+				carta1.desenharCostas();
+				carta2.desenharCostas();
+			}			
+		}
+		
+		function embaralhar() {
+			var j;
+			var k;
+			var temp;
+			var dl = deck.length;
+			
+			for (var i = 0; i < 3 * dl; i ++) {
+				j = Math.floor(Math.random() * dl);
+				k = Math.floor(Math.random() * dl);
+				
+				temp = deck[j].info;
+				deck[j].info = deck[k].info;
+				deck[k].info = temp;
+			}
+		}
+		
+		function escolher(e) {
+			var mx;
+			var my;
+			
+			if (e.layerX || e.layerX == 0) {
+				mx = e.layerX;
+				my = e.layerY;
+			} else if (e.offsetX || e.offsetX == 0) {
+				mx = e.offsetX;
+				my = e.offsetY;
+			}
+			
+			var i;
+			var carta;
+			
+			for (i = 0; i < deck.length; i++) {
+				carta = deck[i];
+				
+				if (carta.x >= 0) { // A carta ainda está no jogo?
+					if ((mx > carta.x) && ( mx < carta.x + carta.w) &&
+						(my > carta.y) && ( my < carta.y + carta.h)) { // O mouse está sobre esta carta?
+						if (primeiraEscolha || i != primeiraCarta) break; // O jogador não está clicando na primeira carta novamente?
+					}
+				}
+			}
+			
+			if (i < deck.length) { // O looping for anterior deu break antes de terminar? 				
+				if (primeiraEscolha) { // Esta foi a primeira seleção?
+					primeiraCarta = i;
+					primeiraEscolha = false;
+					
+					var pol1 = new Poligono(carta.x + carta.w / 2, carta.y + carta.h / 2, carta_r, carta.info);
+					pol1.desenhar();
+				} else { // Caso contrário.
+					segundaCarta = i;
+					
+					var pol2 = new Poligono(carta.x + carta.w / 2, carta.y + carta.h / 2, carta_r, carta.info);
+					pol2.desenhar();
+					
+					if (deck[segundaCarta].info == deck[primeiraCarta].info) { // Teve combinação?
+						combinou = true;
+						// incrementar o número de combinações e exibir pontuação aqui.
+						combinacoes++;
+						document.getElementById('comb').innerHTML = combinacoes;
+						if (combinacoes >= deck.length / 2) { // O jogo acabou?
+							var jogo_t = new Date().getTime();							
+							var intervalo = Math.floor(0.5 + (jogo_t - jogo_t0) / 1000);
+							
+							document.getElementById('tempo').innerHTML = intervalo + 's';
+						}
+					} else { // Não teve combinação.
+						combinou = false;
+					}
+					
+					primeiraEscolha = true;
+					setTimeout(virarCarta, 1000);
+				}
+			}			
+		}
+		
+		function virarCarta() {
+			var c1 = deck[primeiraCarta];
+			var c2 = deck[segundaCarta];
+			if (!combinou) {
+				c1.desenharCostas();
+				c2.desenharCostas();
+			} else {
+				ctx.clearRect(c1.x, c1.y, c1.w, c1.h);
+				ctx.clearRect(c2.x, c2.y, c2.w, c2.h);
+				
+				c1.x = -1;
+				c2.x = -1;
+			}
+		}
+	</script>
+	<style>
+		div {
+			width: 400px;
+			margin: 20px;
+			background-color: pink;
+			padding: 20px;
+		}
+	</style>
+</head>
+<body onload='init();'>
+	Ajude os polígonos a se encontrarem. <br/>
+	<canvas id='canvas' width='900' height='400'></canvas>	
+	<div>
+		Combinações: <span id='comb'></span>
+		<br/>
+		Tempo para completar o desafio: <span id='tempo'></span>
+	</div>
+</body>
+</html>
