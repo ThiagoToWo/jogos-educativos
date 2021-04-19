@@ -25,51 +25,48 @@
 			this.x = x;
 			this.y = y;
 			this.w = w;
-			this.h = h;
+			this.h = h; 
 			this.info = info;
+			this.paraBaixo = false;
+			this.ativa = true;
 			
-			this.desenharCostas = function() {
+			this.desenharCostas = function() {				
 				ctx.save();
 				ctx.fillStyle = 'purple';
 				ctx.fillRect(this.x, this.y, this.w, this.h);
 				ctx.restore();
+				
+				this.paraBaixo = true;
 			}
-		}		
-		
-		function Poligono(x, y, r, n) {
-			this.x = x;
-			this.y = y;
-			this.r = r;
-			this.n = n;
-			this.ang_central = 2 * Math.PI / n;
 			
-			this.desenhar = function() {
+			this.desenharFrente = function() {
+				var ang_central = 2 * Math.PI / this.info;
+				var centro_x = this.x + this.w / 2;
+				var centro_y = this.y + this.h / 2;
+				
 				ctx.save();
 				ctx.fillStyle = 'yellow';
-				ctx.fillRect(
-					this.x - 2 * this.r, 
-					this.y - 2 * this.r, 
-					4 * this.r, 
-					4 * this.r
-				);
+				ctx.fillRect(this.x, this.y, this.w, this.h);
 				
 				ctx.beginPath();
 				ctx.fillStyle = 'red';
 			
 				ctx.moveTo(
-					this.x + this.r * Math.cos((- 0.5) * this.ang_central),
-					this.y + this.r * Math.sin((- 0.5) * this.ang_central)
+					centro_x + (this.w / 4) * Math.cos((- 0.5) * ang_central),
+					centro_y + (this.h / 4) * Math.sin((- 0.5) * ang_central)
 				);
 				
-				for (var i = 1; i < this.n; i++) {
+				for (var i = 1; i < this.info; i++) {
 					ctx.lineTo(
-						this.x + this.r * Math.cos((i - 0.5) * this.ang_central),
-						this.y + this.r * Math.sin((i - 0.5) * this.ang_central)
+						centro_x + (this.w / 4) * Math.cos((i - 0.5) * ang_central),
+						centro_y + (this.h / 4) * Math.sin((i - 0.5) * ang_central)
 					);
 				}
 				ctx.fill();
 				
 				ctx.restore();
+				
+				this.paraBaixo = false;				
 			}
 		}
 
@@ -99,7 +96,9 @@
 				
 				carta1.desenharCostas();
 				carta2.desenharCostas();
-			}			
+			}	
+			
+			embaralhar();
 		}
 		
 		function embaralhar() {
@@ -131,15 +130,15 @@
 			}
 			
 			var i;
-			var carta;
+			var carta;			
 			
 			for (i = 0; i < deck.length; i++) {
 				carta = deck[i];
 				
-				if (carta.x >= 0) { // A carta ainda está no jogo?
+				if (carta.ativa) { // A carta ainda está no jogo?
 					if ((mx > carta.x) && ( mx < carta.x + carta.w) &&
 						(my > carta.y) && ( my < carta.y + carta.h)) { // O mouse está sobre esta carta?
-						if (primeiraEscolha || i != primeiraCarta) break; // O jogador não está clicando na primeira carta novamente?
+						if (primeiraEscolha || i != primeiraCarta) break; // O jogador não está clicando na primeira carta novamente?						
 					}
 				}
 			}
@@ -147,15 +146,14 @@
 			if (i < deck.length) { // O looping for anterior deu break antes de terminar? 				
 				if (primeiraEscolha) { // Esta foi a primeira seleção?
 					primeiraCarta = i;
-					primeiraEscolha = false;
+					primeiraEscolha = false;					
 					
-					var pol1 = new Poligono(carta.x + carta.w / 2, carta.y + carta.h / 2, carta_r, carta.info);
-					pol1.desenhar();
-				} else { // Caso contrário.
+					deck[i].desenharFrente();
+				} else { // Caso contrário.	
+					canvas.removeEventListener('click', escolher, false); // Desativa as possibilidades de escolhas a mais.
 					segundaCarta = i;
 					
-					var pol2 = new Poligono(carta.x + carta.w / 2, carta.y + carta.h / 2, carta_r, carta.info);
-					pol2.desenhar();
+					deck[i].desenharFrente();
 					
 					if (deck[segundaCarta].info == deck[primeiraCarta].info) { // Teve combinação?
 						combinou = true;
@@ -188,9 +186,11 @@
 				ctx.clearRect(c1.x, c1.y, c1.w, c1.h);
 				ctx.clearRect(c2.x, c2.y, c2.w, c2.h);
 				
-				c1.x = -1;
-				c2.x = -1;
+				c1.ativa = false;
+				c2.ativa = false;
 			}
+			
+			canvas.addEventListener('click', escolher, false); // Reativa a possibilidade de escolha.
 		}
 	</script>
 	<style>
