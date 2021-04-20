@@ -15,18 +15,21 @@
 		var carta_h = 4 * carta_r;
 		var margem = 30;
 		var deck = [];
+		var jogoIniciado = false;
 		var primeiraEscolha = true;
 		var primeiraCarta;
 		var segundaCarta;
 		var combinou;
 		var combinacoes = 0;
+		var tentativas = 0;
 		
-		function Carta(x, y, w, h, info) {
+		function Carta(x, y, w, h, info, cor) {
 			this.x = x;
 			this.y = y;
 			this.w = w;
 			this.h = h; 
 			this.info = info;
+			this.cor = cor;
 			this.paraBaixo = false;
 			this.ativa = true;
 			
@@ -49,7 +52,7 @@
 				ctx.fillRect(this.x, this.y, this.w, this.h);
 				
 				ctx.beginPath();
-				ctx.fillStyle = 'red';
+				ctx.fillStyle = this.cor;				
 			
 				ctx.moveTo(
 					centro_x + (this.w / 4) * Math.cos((- 0.5) * ang_central),
@@ -74,28 +77,35 @@
 			canvas = document.getElementById('canvas');
 			ctx = canvas.getContext('2d');
 			canvas.addEventListener('click', escolher, false);
-			fazerDeck();
-			jogo_t0 = new Date().getTime();
+			fazerDeck();			
 			embaralhar();
 		} 
 	
 		function fazerDeck() {
 			var carta1;
 			var carta2;
+			var carta3;
+			var carta4;
 			
 			var cx = carta_x0;
 			var cy = carta_y0;
 			
 			for (var i = 3; i < 9; i++) {
-				carta1 = new Carta(cx, cy, carta_w, carta_h, i);
+				carta1 = new Carta(cx, cy, carta_w, carta_h, i, 'red');
 				deck.push(carta1);
-				carta2 = new Carta(cx, cy + carta_h + margem, carta_w, carta_h, i);
+				carta2 = new Carta(cx, cy + carta_h + margem, carta_w, carta_h, i, 'red');
 				deck.push(carta2);
+				carta3 = new Carta(cx, cy + 2 *(carta_h + margem), carta_w, carta_h, i, 'green');
+				deck.push(carta3);
+				carta4 = new Carta(cx, cy + 3 * (carta_h + margem), carta_w, carta_h, i, 'green');
+				deck.push(carta4);
 				
 				cx += carta_w + margem;
 				
 				carta1.desenharCostas();
 				carta2.desenharCostas();
+				carta3.desenharCostas();
+				carta4.desenharCostas();
 			}	
 			
 			embaralhar();
@@ -104,20 +114,30 @@
 		function embaralhar() {
 			var j;
 			var k;
-			var temp;
+			var temp_info;
+			var temp_cor;
 			var dl = deck.length;
 			
 			for (var i = 0; i < 3 * dl; i ++) {
 				j = Math.floor(Math.random() * dl);
 				k = Math.floor(Math.random() * dl);
 				
-				temp = deck[j].info;
+				temp_info = deck[j].info;
+				temp_cor = deck[j].cor;
+				
 				deck[j].info = deck[k].info;
-				deck[k].info = temp;
+				deck[j].cor = deck[k].cor;
+				
+				deck[k].info = temp_info;
+				deck[k].cor = temp_cor;
 			}
 		}
 		
 		function escolher(e) {
+			if (!jogoIniciado) {
+				jogo_t0 = new Date().getTime();
+				jogoIniciado = true;
+			}
 			var mx;
 			var my;
 			
@@ -150,12 +170,17 @@
 					
 					deck[i].desenharFrente();
 				} else { // Caso contrário.	
+					tentativas++;
+					document.getElementById('tent').innerHTML = tentativas;
+					
 					canvas.removeEventListener('click', escolher, false); // Desativa as possibilidades de escolhas a mais.
+					
 					segundaCarta = i;
 					
 					deck[i].desenharFrente();
 					
-					if (deck[segundaCarta].info == deck[primeiraCarta].info) { // Teve combinação?
+					if ((deck[segundaCarta].info == deck[primeiraCarta].info) &&
+						deck[segundaCarta].cor == deck[primeiraCarta].cor) { // Teve combinação?
 						combinou = true;
 						// incrementar o número de combinações e exibir pontuação aqui.
 						combinacoes++;
@@ -204,8 +229,10 @@
 </head>
 <body onload='init();'>
 	Ajude os polígonos a se encontrarem. <br/>
-	<canvas id='canvas' width='900' height='400'></canvas>	
+	<canvas id='canvas' width='900' height='640'></canvas>	
 	<div>
+		Tentativas (mínimo = 12): <span id='tent'></span>
+		<br/>
 		Combinações: <span id='comb'></span>
 		<br/>
 		Tempo para completar o desafio: <span id='tempo'></span>
