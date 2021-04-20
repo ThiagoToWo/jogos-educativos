@@ -30,7 +30,6 @@
 			this.h = h; 
 			this.info = info;
 			this.cor = cor;
-			this.paraBaixo = false;
 			this.ativa = true;
 			
 			this.desenharCostas = function() {				
@@ -38,8 +37,6 @@
 				ctx.fillStyle = 'purple';
 				ctx.fillRect(this.x, this.y, this.w, this.h);
 				ctx.restore();
-				
-				this.paraBaixo = true;
 			}
 			
 			this.desenharFrente = function() {
@@ -67,9 +64,7 @@
 				}
 				ctx.fill();
 				
-				ctx.restore();
-				
-				this.paraBaixo = false;				
+				ctx.restore();			
 			}
 		}
 
@@ -138,6 +133,7 @@
 				jogo_t0 = new Date().getTime();
 				jogoIniciado = true;
 			}
+			
 			var mx;
 			var my;
 			
