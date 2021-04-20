@@ -7,8 +7,8 @@
 		var canvas;
 		var ctx;
 		var jogo_t0;
-		var carta_x0 = 30;
-		var carta_y0 = 50;
+		var carta_x0 = 0;
+		var carta_y0 = 0;
 		var carta_r = 30;
 		var carta_w = 4 * carta_r;
 		var carta_h = 4 * carta_r;
@@ -190,8 +190,10 @@
 							
 							ctx.clearRect(0, 0, canvas.width, canvas.height);
 							ctx.font = 'bold 30px sans-serif';
-							ctx.fillText('Tentativas (mínimo = 8): ' + tentativas, 30, 300);
-							ctx.fillText('Tempo para completar o desafio: ' + intervalo + 's', 30, 330);
+							ctx.fillText('Tentativas (mínimo = 8): ' + tentativas, 30, 285);
+							ctx.fillText('Tempo para completar o desafio: ' + intervalo + 's', 30, 315);
+						
+							jogoIniciado = false;
 						}
 					} else { // Não teve combinação.
 						combinou = false;
@@ -204,6 +206,8 @@
 		}
 		
 		function virarCarta() {
+			if (!jogoIniciado) return;
+		
 			var c1 = deck[primeiraCarta];
 			var c2 = deck[segundaCarta];
 			if (!combinou) {
@@ -222,15 +226,17 @@
 	</script>
 	<style>
 		div {
-			width: 400px;
-			margin: 20px;
-			background-color: pink;
-			padding: 20px;
+			width: 570px;
+			height: 570px;
+			border: 2px solid black;
+			align: center;
 		}
 	</style>
 </head>
-<body onload='init();' align='center'>
+<body onload='init();'>
 	<h1>A Gangue de Van Der Linde.</h1>
-	<canvas id='canvas' width='640' height='640'></canvas>		
+	<div>
+	<canvas id='canvas' width='570' height='570'></canvas>	
+	</div>
 </body>
 </html>
