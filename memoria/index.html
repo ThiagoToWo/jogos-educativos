@@ -70,23 +70,21 @@
 			
 			var cx = carta_x0;
 			var cy = carta_y0;
-			var seletor1;
-			var seletor2;
-			
-			var seletor1 = Math.floor(Math.random() * pares.length);
-			if (seletor1 >= 12) {
-				seletor2 = seletor1;
-				seletor1 -= 7;
-			} else {
-				seletor2 = seletor1 + 7;
-			}
 			
 			var img1;
 			var img2;
+			var rnd;
 			
-			for (var i = seletor1; i <= seletor2; i++) {
+			for (var i = 0; i < 8; i++) {
+				do {
+					rnd = Math.floor(Math.random() * pares.length);
+				} while (pares[rnd] == undefined)
+				
 				img1 = new Image();
-				img1.src = pares[i];
+				img1.src = pares[rnd];
+				
+				delete pares[rnd];
+				
 				carta1 = new Carta(cx, cy, carta_w, carta_h, i, img1);
 				deck.push(carta1);
 				carta2 = new Carta(cx, cy + carta_h + margem, carta_w, carta_h, i, img1);
@@ -94,8 +92,15 @@
 				
 				i++;
 				
+				do {
+					rnd = Math.floor(Math.random() * pares.length);
+				} while (pares[rnd] == undefined)
+				
 				img2 = new Image();
-				img2.src = pares[i];
+				img2.src = pares[rnd];
+				
+				delete pares[rnd];
+				
 				carta3 = new Carta(cx, cy + 2 *(carta_h + margem), carta_w, carta_h, i, img2);
 				deck.push(carta3);
 				carta4 = new Carta(cx, cy + 3 * (carta_h + margem), carta_w, carta_h, i, img2);
