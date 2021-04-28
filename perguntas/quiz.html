@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Perguntas e Respostas</title>
+	<meta charset="utf-8"/>
+	<style>
+		.elemento {
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			border: 5px double red;
+			background-color: white;
+			margin: 5px;
+			padding: 5px;
+		}
+	</style>
+	<script>
+		var fatos = [
+			['Acre', 'Rio Branco', 'AC'],
+			['Alagoas', 'Maceió', 'AL'],
+			['Amapá', 'Macapá', 'AP'],
+			['Amazonas', 'Manaus', 'AM'],
+			['Bahia', 'Salvador', 'BA'],
+			['Ceará', 'Fortaleza', 'CE'],
+			['Distrito Federal', 'Brasília', 'DF'],
+			['Espírito Santo', 'Vitória', 'ES'],
+			['Goiás', 'Goiânia', 'GO'],
+			['Maranhão', 'São Luís', 'MA'],
+			['Mato Grosso', 'Cuiabá', 'MT'],
+			['Mato Grosso do Sul', 'Campo Grande', 'MS'],
+			['Minas Gerais', 'Belo Horizonte', 'MG'],
+			['Pará', 'Belém', 'PA'],
+			['Paraíba', 'João Pessoa', 'PB'],
+			['Paraná', 'Curitiba', 'PR'],
+			['Pernambuco', 'Recife', 'PE'],
+			['Piauí', 'Teresina', 'PI'],
+			['Rio de Janeiro', 'Rio de Janeiro', 'RJ'],
+			['Rio Grande do Norte', 'Natal', 'RN'],
+			['Rio Grande do Sul', 'Porto Alegre', 'RS'],
+			['Rondônia', 'Porto Velho', 'RO'],
+			['Roraima', 'Boa Vista', 'RR'],
+			['Santa Catarina', 'Florianópolis', 'SC'],
+			['São Paulo', 'São Paulo', 'SP'],
+			['Sergipe', 'Aracaju', 'SE'],
+			['Tocantins', 'Palmas', 'TO'],			
+		]
+		var elemento;		
+		var n = 4;
+		var primeiroElemento;
+		var primeiraSelecao = true;
+		var coluna1 = 20;
+		var linha1 = 300;
+		var linha_h = 50;
+		var entre = 500;
+		var slots = new Array(n);
+		var pontos = 0;
+		
+		function init() {
+			var e;
+			var c;
+			var id_unico;
+			var d;
+			var x = coluna1;
+			var y = linha1;
+			var s;
+			
+			for (var i in fatos) {
+				fatos[i][3] = false;
+			}
+			
+			for (var i in slots) {
+				slots[i] = -1;
+			}
+			
+			for (var i = 0; i < n; i++) {
+				do {
+					e = Math.floor(Math.random() * fatos.length);
+				} while (fatos[e][3] == true);
+				
+				fatos[e][3] = true
+				
+				id_unico = 'e' + e; //'e0'
+				
+				d = document.createElement('estado');
+				d.innerHTML = '<div class="elemento" id="' + id_unico + '"></div>';
+				document.body.appendChild(d);
+				
+				elemento = document.getElementById(id_unico);
+				
+				elemento.style.left = String(x) + 'px';
+				elemento.style.top = String(y) + 'px';
+				elemento.textContent = fatos[e][0];
+				elemento.addEventListener('click', selecionar, false);
+				
+				id_unico = 'c' + e; // 'c0'
+				
+				d = document.createElement('capital');
+				d.innerHTML = '<div class="elemento" id="' + id_unico + '"></div>';
+				document.body.appendChild(d);
+				
+				elemento = document.getElementById(id_unico);
+				
+				do {
+					s = Math.floor(Math.random() * n);
+				} while (slots[s] >=0);
+				
+				slots[s] = e;
+				
+				elemento.style.left = String(coluna1 + entre)  + 'px';
+				elemento.style.top = String(linha1 + s * linha_h) + 'px';
+				elemento.textContent = fatos[e][1];
+				elemento.addEventListener('click', selecionar, false);
+				y += linha_h;
+			}
+
+			function selecionar() {
+				var this_x;
+				var this_xn;
+				
+				if (primeiraSelecao) {
+					primeiroElemento = this;
+					primeiroElemento.style.backgroundColor = 'pink';
+					primeiraSelecao = false;
+				} else {
+					if (this == primeiroElemento) {
+						primeiraSelecao = true;
+						this.style.backgroundColor = 'white';
+						return;
+					}
+					
+					this_x = this.style.left; // '500px'
+					this_x = this_x.substring(0, this_x.length - 2); // '500'
+					this_xn = Number(this_x); // 500
+					
+					primeiroElemento.style.left = String(this_xn + 210) + 'px';
+					primeiroElemento.style.top = this.style.top;
+					
+					primeiraSelecao = true;
+					
+					// 'c27' --> '27', 'e27' --> '27'
+					if (this.id.substring(1) == primeiroElemento.id.substring(1)) {
+						this.style.backgroundColor = 'green';
+						primeiroElemento.style.backgroundColor = 'green';
+						
+						document.getElementById('acao').innerHTML = 'acertou';
+						document.getElementById('pontos').innerHTML = ++pontos; 
+					} else {						
+						document.getElementById('acao').innerHTML = 'errou';
+						primeiroElemento.style.backgroundColor = 'white';
+					}
+				}
+			}
+		}
+	</script>
+</head>
+<body onload='init();'>
+	<h1>Estados do Brasil</h1>
+	Clique sobre um estado ou uma capital e então clique sobre a correspondente capital ou estado.
+	<p> Reinicie para um novo jogo.
+	<div>
+		Ação: <span id='acao'></span>
+		<br/>
+		Pontos: <span id='pontos'>0</span>		
+	</div>
+	</p>
+</body>
+</html>
