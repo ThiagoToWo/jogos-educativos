@@ -16,33 +16,33 @@
 	</style>
 	<script>
 		var fatos = [
-			['Acre', 'Rio Branco', 'AC'],
-			['Alagoas', 'Maceió', 'AL'],
-			['Amapá', 'Macapá', 'AP'],
-			['Amazonas', 'Manaus', 'AM'],
-			['Bahia', 'Salvador', 'BA'],
-			['Ceará', 'Fortaleza', 'CE'],
-			['Distrito Federal', 'Brasília', 'DF'],
-			['Espírito Santo', 'Vitória', 'ES'],
-			['Goiás', 'Goiânia', 'GO'],
-			['Maranhão', 'São Luís', 'MA'],
-			['Mato Grosso', 'Cuiabá', 'MT'],
-			['Mato Grosso do Sul', 'Campo Grande', 'MS'],
-			['Minas Gerais', 'Belo Horizonte', 'MG'],
-			['Pará', 'Belém', 'PA'],
-			['Paraíba', 'João Pessoa', 'PB'],
-			['Paraná', 'Curitiba', 'PR'],
-			['Pernambuco', 'Recife', 'PE'],
-			['Piauí', 'Teresina', 'PI'],
-			['Rio de Janeiro', 'Rio de Janeiro', 'RJ'],
-			['Rio Grande do Norte', 'Natal', 'RN'],
-			['Rio Grande do Sul', 'Porto Alegre', 'RS'],
-			['Rondônia', 'Porto Velho', 'RO'],
-			['Roraima', 'Boa Vista', 'RR'],
-			['Santa Catarina', 'Florianópolis', 'SC'],
-			['São Paulo', 'São Paulo', 'SP'],
-			['Sergipe', 'Aracaju', 'SE'],
-			['Tocantins', 'Palmas', 'TO'],			
+			['Acre', 'Rio Branco', 'AC', false],
+			['Alagoas', 'Maceió', 'AL', false],
+			['Amapá', 'Macapá', 'AP', false],
+			['Amazonas', 'Manaus', 'AM', false],
+			['Bahia', 'Salvador', 'BA', false],
+			['Ceará', 'Fortaleza', 'CE', false],
+			['Distrito Federal', 'Brasília', 'DF', false],
+			['Espírito Santo', 'Vitória', 'ES', false],
+			['Goiás', 'Goiânia', 'GO', false],
+			['Maranhão', 'São Luís', 'MA', false],
+			['Mato Grosso', 'Cuiabá', 'MT', false],
+			['Mato Grosso do Sul', 'Campo Grande', 'MS', false],
+			['Minas Gerais', 'Belo Horizonte', 'MG', false],
+			['Pará', 'Belém', 'PA', false],
+			['Paraíba', 'João Pessoa', 'PB', false],
+			['Paraná', 'Curitiba', 'PR', false],
+			['Pernambuco', 'Recife', 'PE', false],
+			['Piauí', 'Teresina', 'PI', false],
+			['Rio de Janeiro', 'Rio de Janeiro', 'RJ', false],
+			['Rio Grande do Norte', 'Natal', 'RN', false],
+			['Rio Grande do Sul', 'Porto Alegre', 'RS', false],
+			['Rondônia', 'Porto Velho', 'RO', false],
+			['Roraima', 'Boa Vista', 'RR', false],
+			['Santa Catarina', 'Florianópolis', 'SC', false],
+			['São Paulo', 'São Paulo', 'SP', false],
+			['Sergipe', 'Aracaju', 'SE', false],
+			['Tocantins', 'Palmas', 'TO', false],			
 		]
 		var elemento;		
 		var n = 4;
@@ -65,7 +65,7 @@
 			var s;
 			
 			for (var i in fatos) {
-				fatos[i][3] = false;
+				fatos[i][4] = true; // podem ser escolhidos
 			}
 			
 			for (var i in slots) {
@@ -122,8 +122,9 @@
 					primeiroElemento.style.backgroundColor = 'pink';
 					primeiraSelecao = false;
 				} else {
-					if (this == primeiroElemento) {
+					if (this.style.left == primeiroElemento.style.left) {
 						primeiraSelecao = true;
+						primeiroElemento.style.backgroundColor = 'white';
 						this.style.backgroundColor = 'white';
 						return;
 					}
@@ -132,7 +133,7 @@
 					this_x = this_x.substring(0, this_x.length - 2); // '500'
 					this_xn = Number(this_x); // 500
 					
-					primeiroElemento.style.left = String(this_xn + 210) + 'px';
+					primeiroElemento.style.left = String(this_xn + 250) + 'px';
 					primeiroElemento.style.top = this.style.top;
 					
 					primeiraSelecao = true;
@@ -144,9 +145,14 @@
 						
 						document.getElementById('acao').innerHTML = 'acertou';
 						document.getElementById('pontos').innerHTML = ++pontos; 
+						
+						this.removeEventListener('click', selecionar, false);
+						primeiroElemento.removeEventListener('click', selecionar, false);
 					} else {						
 						document.getElementById('acao').innerHTML = 'errou';
 						primeiroElemento.style.backgroundColor = 'white';
+						this.removeEventListener('click', selecionar, false);
+						primeiroElemento.removeEventListener('click', selecionar, false);
 					}
 				}
 			}
