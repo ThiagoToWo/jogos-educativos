@@ -5,37 +5,40 @@
 	<meta name='viewport' content='width=device-width initial-scale=1'/>
 	<meta charset='utf-8'/>
 	<script>
-		var canvas;
-		var ctx;
-		const PPM = 5 // Relação pixel por metros.
-		var x_a = 100;
-		var x_b = 750;
-		var acao;
-		var chao;
-		var coproA;
-		var corpoB;
-		var colisor;
-		var tudo = [];
+		var canvas; // canvas
+		var ctx; // contexto 2d
+		const PPM = 1 // Relação pixel por metros (44px/cm).
+		var x_a = 100; // posição inicial do corpo A
+		var x_b = 750; // posição inicial do corpo B
+		var e; // coeficiente de restituição
+		var v1_final; // velocidade final da preta
+		var v2_final; // velocidade final da branca
+		var coproA; // objeto Corpo
+		var corpoB; // objeto Corpo
+		var processador; // objeto Processador
+		var tudo = []; // guarda os corpos para processamento
 		
-		function Corpo(x, cor) {			
+		// Classe Corpo.
+		function Corpo(x, y, cor) {			
 			this.m = 5;
 			this.r = 10;
 			this.x = x;			
-			this.y = 440;			
+			this.y = y;			
 			this.v = 0;
 			this.cor = cor;
 		}
 		
 		Corpo.prototype.atualizar = function() {
-			this.x += this.v;
+			this.x += this.v * PPM;
 		}
 		
 		Corpo.prototype.desenhar = function() {
+			ctx.save();
 			ctx.beginPath();
 			ctx.fillStyle = this.cor;
 			ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
 			ctx.fill();
-			ctx.closePath();
+			ctx.restore();
 		}
 		
 		Corpo.prototype.colidiuCom = function(outro) {
@@ -47,117 +50,129 @@
 			       (x <= ox + ow);		
 		}
 		
-		function Retangulo(x, y, w, h, cor) {
-			this.x = x;
-			this.y = y;
-			this.w = w;
-			this.h = h;
-			this.cor = cor;			
-		}
-		
-		Retangulo.prototype.desenhar = function() {
-			ctx.fillStyle = this.cor;
-			ctx.fillRect(this.x, this.y, this.w, this.h);
-		}
-		
-		function Colisor() {
+		// Classe Processador.
+		function Processador() {
 			this.elementos = [];
+			this.colidiu = false;
 		}
 		
-		Colisor.prototype.adicionar = function(elemento) {
+		Processador.prototype.adicionar = function(elemento) {
 			this.elementos.push(elemento);
 		}
 		
-		Colisor.prototype.processar = function() {			
-			loop:
+		Processador.prototype.ligar = function() {
+			this._processar();			
+		}
+		
+		Processador.prototype.atualizar = function() {
 			for (var i in this.elementos) {
-				for(var j in this.elementos) {
-					var a = this.elementos[i];
-					var b = this.elementos[j];
-					if (i != j && a.colidiuCom(b)) {
-						var v1_final = (a.m-b.m)*a.v/(a.m+b.m) + (2*b.m)*b.v/(a.m+b.m);
-						var v2_final = (2*a.m)*a.v/(a.m+b.m) + (b.m-a.m)*b.v/(a.m+b.m);
-						a.v = v1_final;
-						b.v = v2_final;
-						break loop;
-					}
-				}
+				this.elementos[i].atualizar();
 			}
+		}
+		
+		Processador.prototype.desenhar = function() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			
+			for (var i in this.elementos) {
+				this.elementos[i].desenhar();
+			}
+			
+			if (this.colidiu == true) this._mostrarResultados();
+		}
+		
+		Processador.prototype.verificarColisao = function() {
+			var a = this.elementos[0];
+			var b = this.elementos[1];
+			
+			if (a.colidiuCom(b)) {
+				var q_total = a.m * a.v +  b.m * b.v;
+				var v_afast = -e * (a.v - b.v);
+				var m_total = a.m + b.m;
+				
+				v1_final = (q_total + b.m * v_afast) / m_total;
+				v2_final = v1_final - v_afast;
+				
+				a.v = v1_final;
+				b.v = v2_final;
+				this.colidiu = true;
+				/*var v1_final = (a.m-b.m)*a.v/(a.m+b.m) + (2*b.m)*b.v/(a.m+b.m);
+				var v2_final = (2*a.m)*a.v/(a.m+b.m) + (b.m-a.m)*b.v/(a.m+b.m);
+				a.v = v1_final;
+				b.v = v2_final;*/
+			}
+		}
+		
+		Processador.prototype._processar = function() {	
+			this.atualizar();
+			this.desenhar()
+			this.verificarColisao();	
+			var p = this;
+			requestAnimationFrame(function() {p._processar();});
+		}
+		
+		Processador.prototype._mostrarResultados = function() {
+			var x = 10;
+			var y = 26;
+			var size = 20;
+			
+			ctx.font = 'bold 20px sans-serif';
+			ctx.fillText('Velocidade final (preta): ' + v1_final.toFixed(2) + 'm/s', x, y);
+			ctx.fillText('Velocidade final (branca): ' + v2_final.toFixed(2) + 'm/s', x, y + size);
 		}
 		
 		function main() {
 			canvas = document.getElementById('canvas');
 			ctx = canvas.getContext('2d');
 			
-			corpoA = new Corpo(x_a, 'red');
-			corpoB = new Corpo(x_b, 'blue');
+			var y = canvas.height / 2;
+			corpoA = new Corpo(x_a, y, 'black');
+			corpoB = new Corpo(x_b, y, 'white');
 			
-			colisor = new Colisor();
-			colisor.adicionar(corpoA);
-			colisor.adicionar(corpoB);
+			processador = new Processador();
+			processador.adicionar(corpoA);
+			processador.adicionar(corpoB);
 			
-			chao = new Retangulo(0, 450, canvas.width, 50, 'green');			
-			var nuvem1 = new Retangulo(100, 80, 200, 30, 'white');
-			var nuvem2 = new Retangulo(20, 100, 500, 30, 'white');
-			var nuvem3 = new Retangulo(800, 10, 100, 20, 'white');
-			var nuvem4 = new Retangulo(750, 120, 600, 40, 'white');
-			
-			tudo.push(chao);
-			tudo.push(nuvem1);
-			tudo.push(nuvem2);
-			tudo.push(nuvem3);
-			tudo.push(nuvem4);			
-			tudo.push(corpoA);
-			tudo.push(corpoB);
-			
-			desenharTudo();
+			processador.desenhar();
 		}
-		
-		function desenharTudo() {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			
-			for (var i in tudo) {
-				tudo[i].desenhar();
-			}			
-		}		
 		
 		function iniciar() {
 			visual()
 			
-			acao = setInterval(processar, 100);
+			processador.ligar();
 			
 			return false;
 		}
 		
 		function visual() {
+			e = Number(f.e.value);
+			
 			corpoA.x = x_a;
 			corpoA.m = Number(f.m1.value);
 			corpoA.v = Number(f.v1.value);
 			corpoA.r = 2 * corpoA.m;
-			corpoA.y = 450 - corpoA.r;
 			
 			corpoB.x = x_b;
 			corpoB.m = Number(f.m2.value);
 			corpoB.v = Number(f.v2.value);
 			corpoB.r = 2 * corpoB.m;
-			corpoB.y = 450 - corpoB.r;
 			
-			desenharTudo();
+			processador.desenhar();
 		}
-			
-		function processar() {			
-			corpoA.atualizar();
-			corpoB.atualizar();
-			
-			desenharTudo();
-			
-			colisor.processar();
-		}		
 	</script>
 	<style>
-		canvas {background: skyblue;}
+		canvas {
+			background: green;
+			position: absolute;
+			left: 0%;
+			width: 100%;
+			height: 100%;
+		}
 		form {
-			width:410px;
+			position: absolute;
+			left: 66%;
+			top: 15%;
+			width: 25%;
+			height: 20%;
 			margin:20px;
 			background: brown;
 			padding: 20px;
@@ -165,35 +180,26 @@
 		}
 		input:valid {background: green;}
 		input:invalid {background: red;}
-		article {
-			text-align: left;
-			margin: 10px;
-			border: 5px green double;
-			padding: 10px;
-			display: inline-table;
-		}		
-		#formulas{width: ;}
-		#exemplo1{width: ;}
-		#exemplo2{width: 450px;}
 	</style>
 </head>
 <body onLoad='main();'>
-	<h1>Simulador de Colisões</h1>
-	<article>
-		<ul>
-		<li>Simule a colisão unidimensional entre dois corpos.</li>
-		</ul>
-	</article>
-	<canvas id='canvas' width='1500' height='500'></canvas>
+	<h1>Simulador de Colisões Unidimensionais</h1>
+	<canvas id='canvas' width='1500' height='700'></canvas>
 	<br/>
 	<form name='f' onSubmit='return iniciar();'>
-		Massa A: <input name='m1' type='number' value='5' min='5' max='20'/>kg
+		Massa (preta): <input name='m1' type='number' value='5' min='5' max='20'/>kg
 		<br/>
-		Velocidade inicial A: <input name='v1' type='number' value='25' min='1' max='40'/>m/s
+		Velocidade inicial (preta): <input name='v1' type='number' value='5' min='1' max='20'/>m/s
 		<br/>
-		Massa B: <input name='m2' type='number' value='5' min='5' max='20'/>kg
+		Massa (<font style='color: white'>branca</font>): <input name='m2' type='number' value='5' min='5' max='20'/>kg
 		<br/>
-		Velocidade inicial B: <input name='v2' type='number' value='25' min='-40' max='40'/>m/s
+		Velocidade inicial (<font style='color: white'>branca</font>): <input name='v2' type='number' value='-5' min='-20' max='20'/>m/s
+		<br/>
+		Coeficiente de restituição: 
+		<br/> 
+		0 (inelástica) &leq; 
+		<input name='e' type='number' value='1' min='0' max='1' step='0.1'/>
+		&leq; 1 (elástica) 
 		<br/>
 		<input type='button' value='Visualizar' onClick='visual();'/>
 		<br/>
