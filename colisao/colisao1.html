@@ -20,8 +20,8 @@
 		
 		// Classe Corpo.
 		function Corpo(x, y, cor) {			
-			this.m = 5;
-			this.r = 10;
+			this.m = 10;
+			this.r = 20;
 			this.x = x;			
 			this.y = y;			
 			this.v = 0;
@@ -116,7 +116,9 @@
 			var size = 20;
 			
 			ctx.font = 'bold 20px sans-serif';
+			ctx.fillStyle = 'black';
 			ctx.fillText('Velocidade final (preta): ' + v1_final.toFixed(2) + 'm/s', x, y);
+			ctx.fillStyle = 'white';
 			ctx.fillText('Velocidade final (branca): ' + v2_final.toFixed(2) + 'm/s', x, y + size);
 		}
 		
@@ -187,11 +189,11 @@
 	<canvas id='canvas' width='1500' height='700'></canvas>
 	<br/>
 	<form name='f' onSubmit='return iniciar();'>
-		Massa (preta): <input name='m1' type='number' value='5' min='5' max='20'/>kg
+		Massa (preta): <input name='m1' type='number' value='10' min='5' max='40' onchange='visual();'/>kg
 		<br/>
 		Velocidade inicial (preta): <input name='v1' type='number' value='5' min='1' max='20'/>m/s
 		<br/>
-		Massa (<font style='color: white'>branca</font>): <input name='m2' type='number' value='5' min='5' max='20'/>kg
+		Massa (<font style='color: white'>branca</font>): <input name='m2' type='number' value='10' min='5' max='40' onchange='visual();'/>kg
 		<br/>
 		Velocidade inicial (<font style='color: white'>branca</font>): <input name='v2' type='number' value='-5' min='-20' max='20'/>m/s
 		<br/>
@@ -200,8 +202,6 @@
 		0 (inelástica) &leq; 
 		<input name='e' type='number' value='1' min='0' max='1' step='0.1'/>
 		&leq; 1 (elástica) 
-		<br/>
-		<input type='button' value='Visualizar' onClick='visual();'/>
 		<br/>
 		<input type='submit' value='Iniciar'/>
 	</form>	
