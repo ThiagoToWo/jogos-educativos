@@ -1,0 +1,218 @@
+<!doctype html>
+<html>
+<head>
+	<title>Régua e Compasso</title>
+	<meta charset='utf-8'/>
+	<style>
+	div {
+		position: absolute;
+		overflow: scroll;
+		//top: 25%;
+		left: 12.5%;
+		width: 75%;
+		height: 75%;
+	}
+	canvas {background: black;}
+	body {
+		text-align: center;
+		background-color: #dff;
+	}
+	table {
+		border-spacing: 20px 0px;
+	}
+	</style>
+	<script>
+	var canvas; // canvas
+	var ctx; // contexto 2d
+	var inst; // instrumento régua ou compasso
+	var esp; // espessura da linha
+	var cl; // cor da linha
+	var cf; // cor de fundo
+	var botDesfaz; // botão para apagar o último elemento
+	var reta; // objeto Reta
+	var circ; // objeto Circunferencia
+	var mx; // coordenada x do mouse
+	var my; // coordenaday do mouse
+	var mouse_move = false; // estado de movimento do mouse
+	var elementos = []; // os objetos criados
+	
+	// Classe regua
+	function Reta(x0, y0, x, y, espessura, cor) {
+		this.x0 = x0;
+		this.y0 = y0;
+		this.x = x;
+		this.y = y;
+		this.espessura = espessura;
+		this.cor = cor;
+	}
+	
+	Reta.prototype.desenhar = function() {
+		ctx.save();
+		ctx.strokeStyle = this.cor;
+		ctx.lineWidth = this.espessura;
+		ctx.beginPath();
+		ctx.moveTo(this.x0, this.y0);
+		ctx.lineTo(this.x, this.y);
+		ctx.stroke();
+		ctx.restore();
+	}
+	
+	// Classe Circunferencia
+	function Circunferencia(x0, y0, raio, espessura, cor) {
+		this.x0 = x0;
+		this.y0 = y0;
+		this.raio = raio;
+		this.espessura = espessura;
+		this.cor = cor;
+	}
+	
+	Circunferencia.prototype.desenhar = function() {
+		ctx.save();
+		ctx.strokeStyle = this.cor;
+		ctx.fillStyle = this.cor;
+		ctx.lineWidth = this.espessura;
+		ctx.beginPath();
+		ctx.arc(this.x0, this.y0, this.raio, 0, 2 * Math.PI);
+		ctx.stroke();		
+		ctx.fillText(String(this.raio.toFixed(0)), this.x0, this.y0 - this.raio - 7);
+		ctx.restore();
+	}
+	
+	function init() {
+		canvas = document.getElementById('canvas');
+		ctx = canvas.getContext('2d');
+		inst = document.getElementById('instrumento'); 
+		esp = document.getElementById('espessura'); 
+		cl = document.getElementById('cor_linha'); 
+		cf = document.getElementById('cor_fundo');
+		botDesfaz = document.getElementById('desfaz');
+		// Inicia desenhando retas
+		canvas.addEventListener('mousedown', iniciarReta, false);
+		canvas.addEventListener('mousemove', tracarReta, false);
+		canvas.addEventListener('mouseup', finalizar, false);
+				
+		inst.onchange = function() {
+			if (inst.value == 'regua') {
+				canvas.removeEventListener('mousedown', iniciarCirc, false);
+				canvas.removeEventListener('mousemove', tracarCirc, false);
+				canvas.addEventListener('mousedown', iniciarReta, false);
+				canvas.addEventListener('mousemove', tracarReta, false);
+			} else {
+				canvas.removeEventListener('mousedown', iniciarReta, false);
+				canvas.removeEventListener('mousemove', tracarReta, false);
+				canvas.addEventListener('mousedown', iniciarCirc, false);
+				canvas.addEventListener('mousemove', tracarCirc, false);
+			}
+		}
+
+		cf.onchange = function() {
+			canvas.style.background = cf.value;
+		}
+		
+		desfaz.onclick = function() {
+			elementos.pop();
+			desenharElementos();
+		}
+	}
+	
+	// funções utilitárias
+	function configurarMouse(mouseEvent) {
+		mx;
+		my;
+		
+		if (mouseEvent.layerX || mouseEvent.layerX == 0) {
+			mx = mouseEvent.layerX;
+			my = mouseEvent.layerY;
+		} else if (mouseEvent.offsetX || mouseEvent.offsetX == 0) {
+			mx = mouseEvent.offsetX;
+			my = mouseEvent.offsetY;
+		}
+	}
+	
+	function desenharElementos() {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		
+		for (var i in elementos) {
+			elementos[i].desenhar();
+		}
+	}
+	// Funções de desenho
+	// Reta
+	function iniciarReta(e) {
+		configurarMouse(e);		
+		mouse_move = true;
+		reta = new Reta(mx, my, mx + 1, my + 1, esp.value, cl.value);
+		elementos.push(reta);
+		desenharElementos();
+	}
+	
+	function tracarReta(e) {
+		if (mouse_move) {
+			configurarMouse(e);
+			reta.x = mx;
+			reta.y = my;
+			desenharElementos();
+		}		
+	}
+	
+	function finalizar() {
+		mouse_move = false;
+	}
+	
+	// Funções de desenho
+	// Circunferencia
+	function iniciarCirc(e) {
+		configurarMouse(e);		
+		mouse_move = true;
+		circ = new Circunferencia(mx, my, esp.value, esp.value, cl.value);
+		elementos.push(circ);
+		desenharElementos();
+	}
+	
+	function tracarCirc(e) {
+		if (mouse_move) {
+			configurarMouse(e);
+			var dx = mx - circ.x0;
+			var dy = my - circ.y0;
+			circ.raio = Math.sqrt(dx * dx + dy * dy);			
+			desenharElementos();
+		}	
+	}
+	</script>
+</head>
+<body onload='init();'>
+	<h1>Régua e Compasso</h1>
+	<table align='center'>
+	<tr><th>Instrumentos<th>Espessura da linha<th>Cor da linha<th>Cor de fundo<th>Desfazer
+	<tr><th><select id='instrumento'>
+		<option value='regua' selected>Régua
+		<option value='compasso'>Compasso
+	</select>
+	<th><select id='espessura'>
+		<option value='1' selected>1px
+		<option value='3'>3px
+		<option value='5'>5px
+	</select>
+	<th><select id='cor_linha'>
+		<option value='white' selected>Branca
+		<option value='black'>Preta
+		<option value='blue'>Azul
+		<option value='red'>Vermelha
+		<option value='green'>Verde
+		<option value='yellow'>Amarela
+	</select>
+	<th><select id='cor_fundo'>
+		<option value='white'>Branca
+		<option value='black' selected>Preta
+		<option value='blue'>Azul
+		<option value='red'>Vermelha
+		<option value='green'>Verde
+		<option value='yellow'>Amarela
+	</select>
+	<th><button id='desfaz'>Desfazer</button>
+	</table>
+	<div id='box'>
+	<canvas id='canvas' width='2000' height='2000'></canvas>
+	</div>
+<body>
+</html>
