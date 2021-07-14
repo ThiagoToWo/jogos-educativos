@@ -6,8 +6,7 @@
 	<style>
 	div {
 		position: absolute;
-		overflow: scroll;
-		//top: 25%;
+		overflow: scroll;		
 		left: 12.5%;
 		width: 75%;
 		height: 75%;
@@ -32,11 +31,11 @@
 	var reta; // objeto Reta
 	var circ; // objeto Circunferencia
 	var mx; // coordenada x do mouse
-	var my; // coordenaday do mouse
+	var my; // coordenada y do mouse
 	var mouse_move = false; // estado de movimento do mouse
 	var elementos = []; // os objetos criados
 	
-	// Classe regua
+	// classe Regua
 	function Reta(x0, y0, x, y, espessura, cor) {
 		this.x0 = x0;
 		this.y0 = y0;
@@ -57,7 +56,7 @@
 		ctx.restore();
 	}
 	
-	// Classe Circunferencia
+	// classe Circunferencia
 	function Circunferencia(x0, y0, raio, espessura, cor) {
 		this.x0 = x0;
 		this.y0 = y0;
@@ -74,7 +73,7 @@
 		ctx.beginPath();
 		ctx.arc(this.x0, this.y0, this.raio, 0, 2 * Math.PI);
 		ctx.stroke();		
-		ctx.fillText(String(this.raio.toFixed(0)), this.x0, this.y0 - this.raio - 7);
+		ctx.fillText(Math.round(this.raio), this.x0, this.y0 - this.raio - 7);
 		ctx.restore();
 	}
 	
@@ -136,6 +135,7 @@
 			elementos[i].desenhar();
 		}
 	}
+	
 	// Funções de desenho
 	// Reta
 	function iniciarReta(e) {
