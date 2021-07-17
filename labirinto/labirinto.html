@@ -10,11 +10,6 @@
 			background: black;
 		}
 		textarea {
-			position: absolute;
-			top: 20%;
-			left: 60%;
-			width: 30%;
-			height: 50%;
 			border: 2px solid black;
 			resize: none;
 		}
@@ -346,7 +341,7 @@
 <body onload='init();'>
 	<h1>Desenhe o Labirinto</h1>
 	<canvas id='canvas' width='900' height='500'></canvas>
-	<textarea id='serial'></textarea>
+	<textarea id='serial' rows='25' cols='60'></textarea>
 	<br/>
 	Desfazer último traço: <button id='desfaz' onclick='desfazerParede();'>Desfazer</button>
 	<form name='fs' onsubmit='return salvarParedes();'>
@@ -358,7 +353,7 @@
 		<input type='submit' value='Carregar labirinto'/>
 	</form>
 	<form name='fcs' onsubmit='return carregarPeloSerial();'>
-		Serial: <input type='text' name='nome_labirinto'/>
+		Código: <input type='text' name='nome_labirinto'/>
 		<input type='submit' value='Carregar labirinto'/>
 	</form>
 </body>
