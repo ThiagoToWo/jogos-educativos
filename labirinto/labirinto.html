@@ -4,13 +4,26 @@
 	<title>Labirinto</title>
 	<meta charset='utf-8'/>
 	<style>
+		body {background: #dff;}
 		canvas {
+			display: inline-block;
 			background: black;
+		}
+		textarea {
+			position: absolute;
+			top: 20%;
+			left: 60%;
+			width: 30%;
+			height: 50%;
+			border: 2px solid black;
+			resize: none;
 		}
 	</style>
 	<script>
 	var canvas; // canvas
 	var ctx; // contexto 2d
+	var serial; // código serial do labirinto
+	var serial_txt; // espaço para o código serial do labirinto
 	var mouse_move = false; // estado de movimento do mouse
 	var paredeAtual; // parede que está sendo desenhada
 	var personagem; // objeto que atravessa o labirinto
@@ -140,7 +153,8 @@
 		ctx = canvas.getContext('2d');
 		canvas.addEventListener('mousedown', iniciarParede, false);
 		canvas.addEventListener('mousemove', marcarParede, false);
-		canvas.addEventListener('mouseup', finalizarParede, false);
+		canvas.addEventListener('mouseup', finalizarParede, false);	
+		serial_txt = document.getElementById('serial');
 		window.addEventListener('keydown', function(e) {
 			var tecla = e.keyCode;
 			switch (tecla) {
@@ -227,9 +241,125 @@
 		mouse_move = false;
 		paredes.push(paredeAtual);
 	}
+	
+	function desfazerParede() {
+		paredes.pop();
+		tudo.pop();
+	}
+	
+	function salvarParedes() {
+		var campos = [];
+		var uma_parede;
+		var todas = [];
+		var serial;
+		var nome = document.fs.nome_labirinto.value;
+		
+		for (var i in paredes) {
+			campos.push(paredes[i].x0);
+			campos.push(paredes[i].y0);
+			campos.push(paredes[i].x);
+			campos.push(paredes[i].y);
+			uma_parede = campos.join(',');
+			todas.push(uma_parede);
+			campos = [];
+		}
+		
+		serial = todas.join(';');
+		serial_txt.value = 'Compartilhe o código abaixo para que outra ' + 
+							   'pessoa possa carregar teu labirinto.\n\n' + serial;
+		try {
+			localStorage.setItem(nome, serial);
+		} catch (erro) {
+			alert('Dado não salvo: ' + erro);
+		}
+		
+		return false;
+	}
+	
+	function carregarParedes() {
+		var nome = document.fc.nome_labirinto.value;
+		var serial;
+		var paredes_carregar;
+		var campos;
+		var x0;
+		var y0;
+		var x;
+		var y;
+		var parede;
+		
+		try {
+			serial = localStorage.getItem(nome);			
+			serial_txt.value = 'Compartilhe o código abaixo para que outra ' + 
+							   'pessoa possa carregar teu labirinto.\n\n' + serial;
+			paredes_carregar = serial.split(';');
+			
+			for (var i in paredes_carregar) {
+				campos = paredes_carregar[i].split(',');
+				x0 = Number(campos[0]);
+				y0 = Number(campos[1]);
+				x = Number(campos[2]);
+				y = Number(campos[3]);
+				parede = new Parede(x0, y0, x, y);
+				paredes.push(parede);
+				tudo.push(parede);
+			}
+		} catch (erro) {
+			alert('Dado não carregado');
+		}
+		
+		return false;
+	}
+	
+	function carregarPeloSerial() {
+		var serial = document.fcs.nome_labirinto.value;
+		var paredes_carregar;
+		var campos;
+		var x0;
+		var y0;
+		var x;
+		var y;
+		var parede;
+		
+		try {			
+			serial_txt.value = 'Compartilhe o código abaixo para que outra ' + 
+							   'pessoa possa carregar teu labirinto.\n\n' + serial;
+			paredes_carregar = serial.split(';');
+			
+			for (var i in paredes_carregar) {
+				campos = paredes_carregar[i].split(',');
+				x0 = Number(campos[0]);
+				y0 = Number(campos[1]);
+				x = Number(campos[2]);
+				y = Number(campos[3]);
+				parede = new Parede(x0, y0, x, y);
+				paredes.push(parede);
+				tudo.push(parede);
+			}
+		} catch (erro) {
+			alert('Entrada de serial inválida.');
+		}
+		
+		return false;
+	}
 	</script>	
 </head>
 <body onload='init();'>
+	<h1>Desenhe o Labirinto</h1>
 	<canvas id='canvas' width='900' height='500'></canvas>
+	<textarea id='serial'></textarea>
+	<br/>
+	Desfazer último traço: <button id='desfaz' onclick='desfazerParede();'>Desfazer</button>
+	<form name='fs' onsubmit='return salvarParedes();'>
+		Nome: <input type='text' name='nome_labirinto'/>
+		<input type='submit' value='Salvar labirinto'/>
+	</form>
+	<form name='fc' onsubmit='return carregarParedes();'>
+		Nome: <input type='text' name='nome_labirinto'/>
+		<input type='submit' value='Carregar labirinto'/>
+	</form>
+	<form name='fcs' onsubmit='return carregarPeloSerial();'>
+		Serial: <input type='text' name='nome_labirinto'/>
+		<input type='submit' value='Carregar labirinto'/>
+	</form>
 </body>
 </html>
