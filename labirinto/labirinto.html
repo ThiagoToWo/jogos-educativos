@@ -5,10 +5,7 @@
 	<meta charset='utf-8'/>
 	<style>
 		body {background: #dff;}
-		canvas {
-			display: inline-block;
-			background: black;
-		}
+		canvas {background: black;}
 		textarea {
 			border: 2px solid black;
 			resize: none;
@@ -339,7 +336,10 @@
 	</script>	
 </head>
 <body onload='init();'>
-	<h1>Desenhe o Labirinto</h1>
+	<font size='6'><b>Desenhe o Labirinto.</b></font>
+	<br/>
+	Use as setas para atravessar com a peça.
+	<br/>
 	<canvas id='canvas' width='900' height='500'></canvas>
 	<textarea id='serial' rows='25' cols='60'></textarea>
 	<br/>
