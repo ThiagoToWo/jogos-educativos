@@ -7,8 +7,20 @@
 		body {background: #dff;}
 		canvas {background: black;}
 		textarea {
+			position: absolute;
+			top: 20%;
+			left: 60%;
 			border: 2px solid black;
 			resize: none;
+		}
+		div {
+			position: absolute;
+			top: 82%;
+		}
+		#fcampo {
+			position: absolute;
+			top: 75%;
+			left: 60%;
 		}
 	</style>
 	<script>
@@ -16,6 +28,7 @@
 	var ctx; // contexto 2d
 	var serial; // código serial do labirinto
 	var serial_txt; // espaço para o código serial do labirinto
+	var exibido = true; // o labirinto está totalmente exibido
 	var mouse_move = false; // estado de movimento do mouse
 	var paredeAtual; // parede que está sendo desenhada
 	var personagem; // objeto que atravessa o labirinto
@@ -56,7 +69,7 @@
 		this.passoX = 0;
 		this.passoY = 0;
 		this.ang_central = 2 * Math.PI / this.n;
-		this.cor = cor;		
+		this.cor = cor;	
 	}
 	
 	Poligono.prototype.atualizar = function() {
@@ -87,7 +100,7 @@
 		}
 	}
 	
-	Poligono.prototype.desenhar = function() {		
+	Poligono.prototype.desenhar = function() {
 		ctx.save();		
 		ctx.beginPath();
 		ctx.fillStyle = this.cor;				
@@ -173,11 +186,11 @@
 		processarTudo();
 	}
 	
-	function processarTudo() {
+	function processarTudo() {		
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		
 		for (var i in tudo) {			
-			tudo[i].atualizar();
+			tudo[i].atualizar();			
 		}
 		
 		for (var i in tudo) {			
@@ -191,7 +204,32 @@
 			}
 		}
 		
+		if (!exibido) clipCampoDeVisao(personagem);
+		
 		requestAnimationFrame(processarTudo);
+	}
+	
+	function mostrarParedes() {
+	
+		if (document.fcampo.campo[0].checked) {
+			exibido = false;
+		} else {
+			exibido = true;
+			canvas.style.clip = 'auto';
+		}
+		
+		return false;
+	}
+	function clipCampoDeVisao(personagem) {
+		var campoX = personagem.x - 5 * personagem.r;
+		var campoY = personagem.y - 5 * personagem.r;
+		var campoL = 10 * personagem.r;
+		
+		canvas.style.position = 'absolute';
+		canvas.style.clip = 'rect(' + campoY + 'px, ' +
+								  (campoX + campoL) +'px,' +
+								  (campoY + campoL) + 'px,' +
+								  campoX + 'px)';
 	}
 	
 	function iniciarParede(e) {
@@ -295,6 +333,11 @@
 				paredes.push(parede);
 				tudo.push(parede);
 			}
+			
+			exibido = true;
+			document.fcampo.campo[1].disabled = false;
+			document.fcampo.campo[1].checked = true;
+			canvas.style.clip = 'auto';
 		} catch (erro) {
 			alert('Dado não carregado');
 		}
@@ -331,6 +374,10 @@
 			alert('Entrada de serial inválida.');
 		}
 		
+		exibido = false;
+		document.fcampo.campo[0].checked = true;
+		document.fcampo.campo[1].disabled = true;
+		
 		return false;
 	}
 	</script>	
@@ -339,11 +386,17 @@
 	<font size='6'><b>Desenhe o Labirinto.</b></font>
 	<br/>
 	Use as setas para atravessar com a peça.
-	<br/>
+	<br/>	
 	<canvas id='canvas' width='900' height='500'></canvas>
 	<textarea id='serial' rows='25' cols='60'></textarea>
 	<br/>
-	Desfazer último traço: <button id='desfaz' onclick='desfazerParede();'>Desfazer</button>
+	<form id='fcampo' name='fcampo' onsubmit='return mostrarParedes();'>
+		<input type='radio' name='campo'/>Com limite de visão</br>
+		<input type='radio' name='campo' checked='true'/>Sem limite de visão</br>
+		<input type='submit' value='Ativar'/>
+	</form>
+	<div>Desfazer último traço: 
+	<button id='desfaz' onclick='desfazerParede();'>Desfazer</button>	
 	<form name='fs' onsubmit='return salvarParedes();'>
 		Nome: <input type='text' name='nome_labirinto'/>
 		<input type='submit' value='Salvar labirinto'/>
@@ -356,5 +409,6 @@
 		Código: <input type='text' name='nome_labirinto'/>
 		<input type='submit' value='Carregar labirinto'/>
 	</form>
+	</div>
 </body>
 </html>
