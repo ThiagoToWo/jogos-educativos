@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+
+<head>
+<style>
+body {background: #ddf;}
+canvas {border: 2px solid black;}
+</style>
+
+<script>
+var canvas; //elemento canvas
+var ctx; // contexto 2d do canvas
+var pedra = null; // guarda o elemento pedra
+var papel = null; // guarda o elemento papel
+var tesoura = null; // guarda o elemento tesoura
+var x0 = 0; // guarda posição horizontal inicial da primeira imagem
+var y0 = 0; // guarda posição vertical inicial da primeira imagem
+var gap = 0; // guarda a distância entre as imagens
+var w = 0; // guarda a largura das imagens
+var h = 0; // guarda a altura das imagens
+var t = 0; // tamanho inicial da imagem que o computador escolheu
+var timer = null; // guarda o temporizador.
+var cpuImg = new Image() // a imagem da escolha do cpu
+var resultado = ''; // guarda o texto do resultado do jogo
+var escolhas = [ // array com o url das imagens a serem escolhidas
+	'img/pedra_luva.png',
+	'img/papel_luva.png',
+	'img/tesoura_luva.png',
+	'img/pedra.png',
+	'img/papel.png',
+	'img/tesoura.png'
+];
+var resultados = [ // array com os textos de resultados
+	['Empate: ambos escolheram pedra.', 
+	 'Vitória: o computador escolheu pedra.', 
+	 'Derrota: o computador escolheu pedra.'],
+	['Derrota: o computador escolheu papel.', 
+	 'Empate: ambos escolheram papel.', 
+	 'Vitória: o computador escolheu papel.'],
+	['Vitória: o computador escolheu tesoura.', 
+	 'Derrota: o computador escolheu tesoura.', 
+	 'Empate: ambos escolheram tesoura.'],
+];
+var sons = [ // arrays com os sons de resposta ao resultado
+	['', '', ''],
+	['', '', ''],
+	['', '', '']
+];
+var tudo = []; // guarda todos os elementos do jogo
+
+function Elemento(x, y, w, h, imagem) {
+	this.x = x;
+	this.y = y;
+	this.w = w;
+	this.h = h;
+	this.imagem = imagem;
+}
+
+Elemento.prototype.desenhar = function() {
+	ctx.drawImage(this.imagem, this.x, this.y, this.w, this.h);
+}
+
+function init() {
+	canvas = document.getElementById('canvas');
+	ctx = canvas.getContext('2d');
+	gap = 10;
+	w = 60;
+	h = 60;
+	x0 = (canvas.width - 3 * w - 2 * gap) / 2;
+	y0 = canvas.height - h - 2;	
+	
+	pedraImg = new Image();
+	papelImg = new Image();
+	tesouraImg = new Image();
+	
+	pedraImg.src = escolhas[0];
+	papelImg.src = escolhas[1];
+	tesouraImg.src = escolhas[2];
+	
+	pedra = new Elemento(x0, y0, w, h, pedraImg);
+	papel = new Elemento(x0 + w + gap, y0, w, h, papelImg);
+	tesoura = new Elemento(x0 + 2* (w + gap), y0, w, h, tesouraImg);
+	
+	pedraImg.onload = function() {pedra.desenhar();}
+	papelImg.onload = function() {papel.desenhar();}
+	tesouraImg.onload = function() {tesoura.desenhar();}	
+	
+	tudo.push(pedra);
+	tudo.push(papel);
+	tudo.push(tesoura);
+	
+	canvas.addEventListener('click', escolher, false);
+	
+	desenharTudo();
+}
+
+function desenharTudo() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	for (var i in tudo) {
+		tudo[i].desenhar();
+	}
+}
+
+function escolher(e) {
+	var indexCpu = Math.floor(Math.random() * 3);
+	cpuImg.src = escolhas[indexCpu];
+	var resultado = 0;
+	var som = 0;
+	var mx;
+	var my;
+	var elt;
+	
+	if (e.layerX || e.layerX ==  0) {
+		mx = e.layerX;
+		my = e.layerY;
+	} else if (e.offsetX || e.offsetX ==  0) {
+		mx = e.offsetX;
+		my = e.offsetY;
+	}
+	
+	for (var i in tudo) {
+		elt = tudo[i];
+		if (mx >= elt.x && 
+			mx <= elt.x + elt.w &&
+			my >= elt.y && 
+			my <= elt.y + elt.h
+			) {
+			t = 5;
+			resultado = escolhas[indexCpu][i];
+			timer = setInterval(aparecerFigura, 100);			
+		}
+	}
+}
+
+function aparecerFigura() {
+	desenharTudo();
+	ctx.drawImage(cpuImg, (canvas.width - t) / 2, 250, t, t);
+	t += 5;
+	
+	if (t == 60) {
+		clearInterval(timer);
+		ctx.fillText(resultado, 200, 100, 250);
+	}	
+}
+
+window.onload = init;
+</script>
+</head>
+
+<body>
+<canvas id='canvas' width='500' height='500'></canvas>
+</body>
+</html>
