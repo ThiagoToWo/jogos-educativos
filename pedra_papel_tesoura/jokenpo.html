@@ -10,6 +10,8 @@ canvas {border: 2px solid black;}
 <script>
 var canvas; //elemento canvas
 var ctx; // contexto 2d do canvas
+var pontoJogador = null // guarda o elemento ponto do jogador
+var pontoCpu = null // guarda o elemento ponto do cpu
 var pedra = null; // guarda o elemento pedra
 var papel = null; // guarda o elemento papel
 var tesoura = null; // guarda o elemento tesoura
@@ -22,29 +24,36 @@ var t = 0; // tamanho inicial da imagem que o computador escolheu
 var timer = null; // guarda o temporizador.
 var cpuImg = new Image() // a imagem da escolha do cpu
 var resultado = ''; // guarda o texto do resultado do jogo
+var som = null; // guarda o som a ser feito após o resultado
+var ponto = 0; // guarda o acréscimo de ponto ao jogador
 var escolhas = [ // array com o url das imagens a serem escolhidas
-	'img/pedra_luva.png',
-	'img/papel_luva.png',
-	'img/tesoura_luva.png',
+	//'img/pedra_luva.png',
+	//'img/papel_luva.png',
+	//'img/tesoura_luva.png',
 	'img/pedra.png',
 	'img/papel.png',
 	'img/tesoura.png'
 ];
 var resultados = [ // array com os textos de resultados
 	['Empate: ambos escolheram pedra.', 
-	 'Vitória: o computador escolheu pedra.', 
-	 'Derrota: o computador escolheu pedra.'],
-	['Derrota: o computador escolheu papel.', 
+	 'Vitória: o computador escolheu pedra. Papel embrulha pedra.', 
+	 'Derrota: o computador escolheu pedra. Pedra quebra tesoura.'],
+	['Derrota: o computador escolheu papel. Papel embrulha pedra.', 
 	 'Empate: ambos escolheram papel.', 
-	 'Vitória: o computador escolheu papel.'],
-	['Vitória: o computador escolheu tesoura.', 
-	 'Derrota: o computador escolheu tesoura.', 
+	 'Vitória: o computador escolheu papel. Tesoura corta papel.'],
+	['Vitória: o computador escolheu tesoura. Pedra quebra tesoura.', 
+	 'Derrota: o computador escolheu tesoura. Tesoura corta papel.', 
 	 'Empate: ambos escolheram tesoura.'],
 ];
 var sons = [ // arrays com os sons de resposta ao resultado
 	['', '', ''],
 	['', '', ''],
 	['', '', '']
+];
+var pontos = [ // arrays com os pontos ganhos pelo jogador
+	[0, 1, -1],
+	[-1, 0, 1],
+	[1, -1, 0]
 ];
 var tudo = []; // guarda todos os elementos do jogo
 
@@ -63,6 +72,10 @@ Elemento.prototype.desenhar = function() {
 function init() {
 	canvas = document.getElementById('canvas');
 	ctx = canvas.getContext('2d');
+	ctx.fillStyle = 'black';
+	ctx.font = 'bold 16pt Georgia';
+	pontoJogador = document.getElementById('jogador');
+	pontoCpu = document.getElementById('cpu');
 	gap = 10;
 	w = 60;
 	h = 60;
@@ -104,7 +117,6 @@ function desenharTudo() {
 function escolher(e) {
 	var indexCpu = Math.floor(Math.random() * 3);
 	cpuImg.src = escolhas[indexCpu];
-	var resultado = 0;
 	var som = 0;
 	var mx;
 	var my;
@@ -126,21 +138,36 @@ function escolher(e) {
 			my <= elt.y + elt.h
 			) {
 			t = 5;
-			resultado = escolhas[indexCpu][i];
+			resultado = resultados[indexCpu][i];
+			ponto = pontos[indexCpu][i];
 			timer = setInterval(aparecerFigura, 100);			
+			break;
 		}
 	}
 }
 
 function aparecerFigura() {
+	canvas.removeEventListener('click', escolher, false);
 	desenharTudo();
 	ctx.drawImage(cpuImg, (canvas.width - t) / 2, 250, t, t);
 	t += 5;
 	
 	if (t == 60) {
-		clearInterval(timer);
-		ctx.fillText(resultado, 200, 100, 250);
+		clearInterval(timer);			
+		ctx.fillText(resultado, (canvas.width - 450) / 2, 200, 450);
+		incrementarPontos();
+		canvas.addEventListener('click', escolher, false);
 	}	
+}
+
+function incrementarPontos() {
+	var atualJogador = Number(pontoJogador.innerText);
+	var atualCpu = Number(pontoCpu.innerText);
+	if (ponto == 1) { // jogador ganhou
+		pontoJogador.innerText = atualJogador + ponto;
+	} else if (ponto == -1){ // cpu ganhou
+		pontoCpu.innerText = atualCpu + 1;
+	}
 }
 
 window.onload = init;
@@ -148,6 +175,11 @@ window.onload = init;
 </head>
 
 <body>
+<h1>Pedra - papel - tesoura</h1>
 <canvas id='canvas' width='500' height='500'></canvas>
+<br/>
+Pontos:<br/>
+&emsp;Jogador = <span id='jogador'>0</span><br/>
+&emsp;CPU = <span id='cpu'>0</span>
 </body>
 </html>
