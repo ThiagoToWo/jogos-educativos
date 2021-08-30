@@ -24,6 +24,7 @@ var t = 0; // tamanho inicial da imagem que o computador escolheu
 var timer = null; // guarda o temporizador.
 var cpuImg = new Image() // a imagem da escolha do cpu
 var resultado = ''; // guarda o texto do resultado do jogo
+var audios = null; // guarda os elementos de áudio acessados no html
 var som = null; // guarda o som a ser feito após o resultado
 var ponto = 0; // guarda o acréscimo de ponto ao jogador
 var escolhas = [ // array com o url das imagens a serem escolhidas
@@ -46,9 +47,9 @@ var resultados = [ // array com os textos de resultados
 	 'Empate: ambos escolheram tesoura.'],
 ];
 var sons = [ // arrays com os sons de resposta ao resultado
-	['', '', ''],
-	['', '', ''],
-	['', '', '']
+	[-1, 1, 0],
+	[1, -1, 2],
+	[0, 2, -1]
 ];
 var pontos = [ // arrays com os pontos ganhos pelo jogador
 	[0, 1, -1],
@@ -76,6 +77,7 @@ function init() {
 	ctx.font = 'bold 16pt Georgia';
 	pontoJogador = document.getElementById('jogador');
 	pontoCpu = document.getElementById('cpu');
+	audios = document.getElementsByTagName('audio');
 	gap = 10;
 	w = 60;
 	h = 60;
@@ -117,7 +119,6 @@ function desenharTudo() {
 function escolher(e) {
 	var indexCpu = Math.floor(Math.random() * 3);
 	cpuImg.src = escolhas[indexCpu];
-	var som = 0;
 	var mx;
 	var my;
 	var elt;
@@ -135,11 +136,11 @@ function escolher(e) {
 		if (mx >= elt.x && 
 			mx <= elt.x + elt.w &&
 			my >= elt.y && 
-			my <= elt.y + elt.h
-			) {
+			my <= elt.y + elt.h) {
 			t = 5;
 			resultado = resultados[indexCpu][i];
 			ponto = pontos[indexCpu][i];
+			som = sons[indexCpu][i];
 			timer = setInterval(aparecerFigura, 100);			
 			break;
 		}
@@ -155,6 +156,7 @@ function aparecerFigura() {
 	if (t == 60) {
 		clearInterval(timer);			
 		ctx.fillText(resultado, (canvas.width - 450) / 2, 200, 450);
+		if(som > -1) audios[som].play();
 		incrementarPontos();
 		canvas.addEventListener('click', escolher, false);
 	}	
@@ -181,5 +183,14 @@ window.onload = init;
 Pontos:<br/>
 &emsp;Jogador = <span id='jogador'>0</span><br/>
 &emsp;CPU = <span id='cpu'>0</span>
+<audio>
+	<source src='snd/pedra_quebrando.mp3'>
+</audio>
+<audio>
+	<source src='snd/papel_embrulhando.mp3'>
+</audio>
+<audio>
+	<source src='snd/tesoura_cortando.mp3'>
+</audio>
 </body>
 </html>
