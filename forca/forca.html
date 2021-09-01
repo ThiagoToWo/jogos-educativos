@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Forca</title>
+	<meta charset='utf-8'/>
+	<style>
+	.letra {
+		position: absolute;
+		border: 2px double black;
+		margin: 5px;
+		padding: 5px;
+		color: #f00;
+		background-color: #0fc;
+		font-family: 'Courier New', Courier, monospace;
+	}
+	.lacuna {
+		position: absolute;
+		border: none;
+		margin: 5px;
+		padding: 5px;
+		color: black;
+		background-color: white;
+		font-family: 'Courier New', Courier, monospace;
+		text-decoration: underline;
+	}
+	</style>
+	<script defer src='palavras.js'></script>
+	<script>
+	var canvas = null;
+	var ctx = null;
+	var letra = null;
+	var letraY = 300;
+	var letraX = 20;
+	var letraW = 25;
+	var lacuna = null;
+	var lacunaY = 150;
+	var lacunaX = 160;
+	var lacunaW = 50;
+	var index;
+	var palavra;
+	var eixo = 70;
+	
+	function init() {
+		canvas = document.getElementById('canvas');
+		ctx = canvas.getContext('2d');
+		setupGame();
+	}
+
+	function setupGame() {
+		var alfabeto = 'abcdefghijklmnopqrstuvwxyz';
+		
+		for (var i = 0; i < alfabeto.length; i++) {
+			letra = document.createElement('span');
+			letra.className = 'letra';
+			letra.id = 'le' + i;
+			letra.innerText = alfabeto[i];
+			
+			letra.style.top = String(letraY) + 'px';
+			letra.style.left = String(letraX + letraW * i) + 'px';
+			
+			document.body.appendChild(letra);
+			letra.addEventListener('click', selecionarLetra, false);
+		}
+		
+		index = Math.floor(Math.random() * palavras.length);
+		palavra = palavras[index];
+		
+		for (var i = 0; i < palavra.length; i++) {
+			lacuna = document.createElement('span');
+			lacuna.className = 'lacuna';
+			lacuna.id = 'la' + i;
+			lacuna.innerText = '?';
+			
+			lacuna.style.top = String(lacunaY) + 'px';
+			lacuna.style.left = String(lacunaX + lacunaW * i) + 'px';
+			
+			document.body.appendChild(lacuna);
+		}
+		desenharPatibulo();
+		desenharCabeca();
+	}
+	
+	function selecionarLetra() {
+		this.style.display = 'none';
+	}
+	
+	function desenharPatibulo() {
+		ctx.lineWidth = 8;
+		ctx.strokeStyle = 'brown';
+		ctx.beginPath();
+		ctx.moveTo(2, 180);
+		ctx.lineTo(40, 180);
+		ctx.moveTo(20, 180);
+		ctx.lineTo(20, 40);
+		ctx.moveTo(2, 40);
+		ctx.lineTo(80, 40);
+		ctx.stroke();
+		ctx.closePath();
+	}
+	
+	function desenharCabeca() {
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = 'black';
+		ctx.save();
+		ctx.scale(.6, 1);
+		ctx.beginPath();
+		ctx.arc(eixo / .6, 80, 10, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.closePath();
+		ctx.restore();
+	}
+	
+	function desenharCorpo() {
+	
+	}
+	
+	function desenharBracoDireito() {
+	
+	}
+	
+	
+	function desenharBracoEsquerdo() {
+	
+	}
+	
+	function desenharPernaDireita() {
+	
+	}
+	
+	function desenharPernaEsquerda() {
+	
+	}
+	
+	function desenharCorda() {
+	
+	}
+	
+	window.onload = init;	
+	</script>
+</head>
+<body>
+	<h1>Jogo da forca</h1>
+	<canvas id='canvas' width='600' height='400'></canvas>
+</body>
+</html>

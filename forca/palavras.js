@@ -1,0 +1,1 @@
+var palavras = ['pau', 'cu', 'boceta'];
