@@ -26,29 +26,41 @@
 	</style>
 	<script defer src='palavras.js'></script>
 	<script>
-	var canvas = null;
-	var ctx = null;
-	var letra = null;
-	var letraY = 300;
-	var letraX = 20;
-	var letraW = 25;
-	var lacuna = null;
-	var lacunaY = 150;
-	var lacunaX = 160;
-	var lacunaW = 50;
-	var index;
-	var palavra;
-	var eixo = 70;
+	var canvas = null; // elemento canvas
+	var ctx = null; // contexto 2d do canvas
+	var letra = null; // span da letra
+	var letraY = 300; // posição y das letras
+	var letraX = 20; // posição x das letras
+	var letraW = 25; // largura das letras
+	var lacuna = null; // span do espaço para a letra escondida
+	var lacunaY = 150; // posição y das letras escondidas
+	var lacunaX = 160; // posição x das letras escondidas
+	var lacunaW = 50; // largura das letras escondidas
+	var alfabeto = 'abcdefghijklmnopqrstuvwxyz'; // as letras dos botões
+	var index; // índice da palavra sorteada
+	var palavra; // guarda a palavra escolhida
+	var eixo = 70; // eixo central do corpo 
+	var tracos = [ // as funções de desenho
+		desenharPatibulo,
+		desenharCabeca,
+		desenharCorpo,
+		desenharBracoDireito,
+		desenharBracoEsquerdo,
+		desenharPernaDireita,
+		desenharPernaEsquerda,
+		desenharCorda
+	]
+	var passo = 0; // os passo atual do desenho
+	var letrasIdentificadas = 0; // conta o número de letras identificadas
 	
 	function init() {
 		canvas = document.getElementById('canvas');
 		ctx = canvas.getContext('2d');
 		setupGame();
+		ctx.font = 'bold 20pt Ariel';
 	}
 
-	function setupGame() {
-		var alfabeto = 'abcdefghijklmnopqrstuvwxyz';
-		
+	function setupGame() {		
 		for (var i = 0; i < alfabeto.length; i++) {
 			letra = document.createElement('span');
 			letra.className = 'letra';
@@ -76,12 +88,70 @@
 			
 			document.body.appendChild(lacuna);
 		}
-		desenharPatibulo();
-		desenharCabeca();
+		
+		tracos[passo++]();
 	}
 	
 	function selecionarLetra() {
+		var naoIdentificado = true;
+		var letraClicada = this.textContent;
+		var variacoes;
+		
+		if (letraClicada === 'a') {
+			variacoes = ['a', 'á', 'â', 'ã', 'A', 'Á', 'Â', 'Ã'];
+		} else if (letraClicada === 'c') {
+			variacoes = ['c', 'ç', 'C', 'Ç'];
+		} else if (letraClicada === 'e') {
+			variacoes = ['e', 'é', 'ê', 'E', 'É', 'Ê'];
+		} else if (letraClicada === 'i') {
+			variacoes = ['i', 'í', 'I', 'Í'];
+		} else if (letraClicada === 'o') {
+			variacoes = ['o', 'ó', 'ô', 'õ', 'O', 'Ó', 'Ô', 'Õ'];
+		} else if (letraClicada === 'u') {
+			variacoes = ['u', 'ú', 'U', 'Ú'];
+		} else {
+			variacoes = [letraClicada, letraClicada.toUpperCase()];
+		}
+		
+		for (var i = 0; i < palavra.length; i++) {		
+			for (var j = 0; j < variacoes.length; j++) {			
+				if (variacoes[j] == palavra[i]) { // se achou a letra
+					naoIdentificado = false;
+					document.getElementById('la' + i).textContent = variacoes[j];
+					letrasIdentificadas++;
+					if (letrasIdentificadas == palavra.length) { // se ganhou
+						exibirMensagem('Você venceu!');
+						removerOuvinte();
+					}
+				}
+			}			
+		}
+		
+		if (naoIdentificado) { // se não achou a letra
+			tracos[passo++]();
+			if (passo >= tracos.length) { // se perdeu
+				for (var i = 0; i < palavra.length; i++) {
+					document.getElementById('la' + i).textContent = palavra[i];
+					exibirMensagem('Você perdeu');
+					removerOuvinte();
+				}
+			}
+		}
+		
 		this.style.display = 'none';
+	}
+	
+	function exibirMensagem(s) {
+		ctx.fillText(s, 120, 100);
+		ctx.fillText('Recarregue a página para jogar de novo.', 120, 140);
+	}
+	
+	function removerOuvinte() {
+		var letra;
+		for (var i = 0; i < alfabeto.length; i++) {
+			letra = document.getElementById('le' + i);
+			letra.removeEventListener('click', selecionarLetra, false);
+		}
 	}
 	
 	function desenharPatibulo() {
@@ -111,28 +181,71 @@
 	}
 	
 	function desenharCorpo() {
-	
+		ctx.beginPath();
+		ctx.moveTo(eixo, 90);
+		ctx.lineTo(eixo, 125);
+		ctx.stroke();
+		ctx.closePath();
 	}
 	
 	function desenharBracoDireito() {
-	
+		ctx.beginPath();
+		ctx.moveTo(eixo, 100);
+		ctx.lineTo(eixo + 20, 110);
+		ctx.stroke();
+		ctx.closePath();
 	}
 	
 	
 	function desenharBracoEsquerdo() {
-	
+		ctx.beginPath();
+		ctx.moveTo(eixo, 100);
+		ctx.lineTo(eixo - 20, 110);
+		ctx.stroke();
+		ctx.closePath();
 	}
 	
 	function desenharPernaDireita() {
-	
+		ctx.beginPath();
+		ctx.moveTo(eixo, 125);
+		ctx.lineTo(eixo + 10, 155);
+		ctx.stroke();
+		ctx.closePath();
 	}
 	
 	function desenharPernaEsquerda() {
-	
+		ctx.beginPath();
+		ctx.moveTo(eixo, 125);
+		ctx.lineTo(eixo - 10, 155);
+		ctx.stroke();
+		ctx.closePath();
 	}
 	
 	function desenharCorda() {
+		ctx.strokeStyle = 'tan';
+		ctx.beginPath();
+		ctx.moveTo(eixo - 10, 40);
+		ctx.lineTo(eixo - 5, 95);
+		ctx.stroke();
+		ctx.closePath();
+		
+		ctx.save();		
+		ctx.scale(1, .3);
+		ctx.beginPath();
+		ctx.arc(eixo, 95 / .3, 8, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.restore();
+		desenharPescoco();
+		desenharCabeca();
+	}
 	
+	function desenharPescoco() {
+		ctx.strokeStyle = 'black';
+		ctx.beginPath();
+		ctx.moveTo(eixo, 90);
+		ctx.lineTo(eixo, 95);
+		ctx.stroke();
+		ctx.closePath();
 	}
 	
 	window.onload = init;	
