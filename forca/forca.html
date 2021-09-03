@@ -21,7 +21,6 @@
 		color: black;
 		background-color: white;
 		font-family: 'Courier New', Courier, monospace;
-		text-decoration: underline;
 	}
 	</style>
 	<script defer src='palavras.js'></script>
@@ -52,6 +51,7 @@
 	]
 	var passo = 0; // os passo atual do desenho
 	var letrasIdentificadas = 0; // conta o número de letras identificadas
+	var separadores = 0; // conta os separadores de palavras ("-" e " ").
 	
 	function init() {
 		canvas = document.getElementById('canvas');
@@ -81,7 +81,16 @@
 			lacuna = document.createElement('span');
 			lacuna.className = 'lacuna';
 			lacuna.id = 'la' + i;
-			lacuna.innerText = '?';
+			
+			if (palavra[i] === ' ') {
+				lacuna.innerText = ' ';
+				separadores++;
+			} else if (palavra[i] === '-') {
+				lacuna.innerText = '-';
+				separadores++;
+			} else {
+				lacuna.innerText = '?';
+			}
 			
 			lacuna.style.top = String(lacunaY) + 'px';
 			lacuna.style.left = String(lacunaX + lacunaW * i) + 'px';
@@ -119,7 +128,7 @@
 					naoIdentificado = false;
 					document.getElementById('la' + i).textContent = variacoes[j];
 					letrasIdentificadas++;
-					if (letrasIdentificadas == palavra.length) { // se ganhou
+					if (letrasIdentificadas == palavra.length - separadores) { // se ganhou
 						exibirMensagem('Você venceu!');
 						removerOuvinte();
 					}
@@ -132,7 +141,7 @@
 			if (passo >= tracos.length) { // se perdeu
 				for (var i = 0; i < palavra.length; i++) {
 					document.getElementById('la' + i).textContent = palavra[i];
-					exibirMensagem('Você perdeu');
+					exibirMensagem('Você perdeu.');
 					removerOuvinte();
 				}
 			}
