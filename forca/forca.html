@@ -4,6 +4,7 @@
 	<title>Forca</title>
 	<meta charset='utf-8'/>
 	<style>
+	body {background: #eeeeee;}
 	.letra {
 		position: absolute;
 		border: 2px double black;
@@ -19,7 +20,7 @@
 		margin: 5px;
 		padding: 5px;
 		color: black;
-		background-color: white;
+		background-color: #eeeeee;
 		font-family: 'Courier New', Courier, monospace;
 	}
 	</style>
@@ -35,6 +36,8 @@
 	var lacunaY = 150; // posição y das letras escondidas
 	var lacunaX = 160; // posição x das letras escondidas
 	var lacunaW = 50; // largura das letras escondidas
+	var entrada = null; // o input de texto da nova palavra
+	var botaoNovo = null; // o botão para incluir nova palavra
 	var alfabeto = 'abcdefghijklmnopqrstuvwxyz'; // as letras dos botões
 	var index; // índice da palavra sorteada
 	var palavra; // guarda a palavra escolhida
@@ -56,11 +59,25 @@
 	function init() {
 		canvas = document.getElementById('canvas');
 		ctx = canvas.getContext('2d');
+		entrada = document.getElementById('palavra');
+		botaoNovo = document.getElementById('nova');
+		botaoNovo.addEventListener('click', substituirPalavra, false);
 		setupGame();
 		ctx.font = 'bold 20pt Ariel';
 	}
 
 	function setupGame() {		
+		criarAlfabeto();
+		
+		index = Math.floor(Math.random() * palavras.length);
+		palavra = palavras[index];
+		
+		criarLacunas()
+		
+		tracos[passo++]();
+	}
+	
+	function criarAlfabeto() {
 		for (var i = 0; i < alfabeto.length; i++) {
 			letra = document.createElement('span');
 			letra.className = 'letra';
@@ -73,10 +90,9 @@
 			document.body.appendChild(letra);
 			letra.addEventListener('click', selecionarLetra, false);
 		}
-		
-		index = Math.floor(Math.random() * palavras.length);
-		palavra = palavras[index];
-		
+	}
+	
+	function criarLacunas() {
 		for (var i = 0; i < palavra.length; i++) {
 			lacuna = document.createElement('span');
 			lacuna.className = 'lacuna';
@@ -97,7 +113,18 @@
 			
 			document.body.appendChild(lacuna);
 		}
-		
+	}
+	
+	function substituirPalavra() {
+		var elemento;
+		for (var i = 0; i < palavra.length; i++) {
+			elemento = document.getElementById('la' + i);
+			elemento.parentNode.removeChild(elemento);
+		}
+		palavra = entrada.value;		
+		criarLacunas();		
+		entrada.value = '';
+		passo = 0;
 		tracos[passo++]();
 	}
 	
@@ -262,6 +289,9 @@
 </head>
 <body>
 	<h1>Jogo da forca</h1>
-	<canvas id='canvas' width='600' height='400'></canvas>
+	<canvas id='canvas' width='600' height='250'></canvas>
+	<br/>
+	<input type='text' id='palavra'/>
+	<button id='nova'>Nova Palavra</button>
 </body>
 </html>
