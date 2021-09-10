@@ -4,19 +4,27 @@
 	<title>Blackjack	</title>
 	<meta charset='utf-8'/>
 	<style>
+	body {background: #ff8040;}
 	canvas {background: green;}
-	#ptsj {
+	#valores {
 		position: absolute;
-		left: 1010px;
-		top: 100px;
+		left: 720px;
+		top: 50px;
 	}
-	#ptsc {
+	#pontos {
 		position: absolute;
-		left: 1010px;
-		top: 300px;
+		left: 720px;
+		top: 200px;
 	}
+	#fichas {
+		position: absolute;
+		left: 720px;
+		top: 400px;
+	}	
 	</style>
 	<script>
+	//implementar o que fazer quando o dinheiro acabar
+	//implementar o que fazer quando o baralho acabar
 	const DECK = new Image();
 	DECK.src = 'baralho.png';
 	const CARTA_W = 960 / 13;
@@ -99,12 +107,15 @@
 	var botNew; // botão de nova rodada
 	var pontosJogador; // guarda o span para exibir pontos do jogador
 	var pontosCasa; // guarda o span para exibir pontos da casa
+	var banco; // guarda o span do banco doo jogador
+	var aposta; // guarda o span do valor da aposta
+	var fichas; // guarda um array com os botões de ficha
 	var baralho; // guarda o objeto baralho
 	var maoJogador = []; // guarda as cartas dos jogadores
 	var maoCasa = []; // guarda as cartas da casa
 	var jogadorX = 100; // posisão x inicial das cartas do jogador
 	var jogadorY = 400; // posisão y inicial das cartas do jogador
-	var casaX = 500 - CARTA_W / 2; // posisão x inicial das cartas da casa
+	var casaX = 400 - CARTA_W / 2; // posisão x inicial das cartas da casa
 	var casaY = 100; // posisão y inicial das cartas da casa
 	var dX = 30; // guarda o deslocamanto horizontal de desenho das cartas
 	var pontos = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]; // o ponto de cada carta
@@ -121,10 +132,21 @@
 		botNew = document.getElementById('new');
 		pontosJogador = document.getElementById('ptsj');
 		pontosCasa = document.getElementById('ptsc');
+		banco = document.getElementById('banco');
+		aposta = document.getElementById('aposta');
 		
-		botDeal.addEventListener('click', distribuirCartas, false);
+		fichas = document.getElementsByClassName('ficha');
+		for (var i = 0; i < fichas.length; i++) {
+			fichas[i].addEventListener('click', apostar, false);
+		}
+		
+		botDeal.addEventListener('click', comprarCartas, false);
 		botHold.addEventListener('click', manterMao, false);
 		botNew.addEventListener('click', novaRodada, false);
+		botDeal.disabled = true;
+		botHold.disabled = true;
+		botNew.disabled = true;
+		
 		ctx.font = 'italic 20pt Georgia';
 		
 		baralho = new Baralho(pontos);
@@ -158,45 +180,64 @@
 		darPara(maoCasa);
 	}
 	
-	function distribuirCartas() {
+	function comprarCartas() {
 		darPara(maoJogador);
-		
-		/*if (totalCasa < 17) {
-			darPara(maoCasa);
-		}*/
+		for (var i = 0; i < fichas.length; i++) {
+			fichas[i].disabled= true;
+		}
 	}
 	
 	function manterMao() {
+		
 		botDeal.disabled = true;
+		for (var i = 0; i < fichas.length; i++) {
+			fichas[i].disabled= true;
+		}
+		botHold.disabled = true;
+		botNew.disabled = false;
+		
 		while (totalCasa < 17) {
 			darPara(maoCasa);
 		}
 		
 		mostrarCasa();
 		
+		var b = Number(banco.textContent);
+		var a = Number(aposta.textContent);
+		
 		if (totalJogador > 21) { // jogador perdeu?
 			if (totalCasa > 21) { // casa perdeu?
 				ctx.fillText('Você e a casa perderam.', msgX, msgY);
+				banco.textContent = b + a;
+				aposta.textContent = 0;				
 			} else { // casa ganhou?
 				ctx.fillText('Você estourou os 21 pontos e perdeu.', msgX, msgY);
+				aposta.textContent = 0;
 			}			
 		} else { // jogador pode ganhar?
 			if (totalCasa > 21) { // casa perdeu?
 				ctx.fillText('A casa estourou os 21 pontos e perdeu.', msgX, msgY);
+				banco.textContent = b + 2 * a;
+				aposta.textContent = 0;	
 			} else { // os dois menores que 21?
 				if (totalJogador > totalCasa) { 
 					ctx.fillText('Você ganhou!', msgX, msgY);
+					banco.textContent = b + 2 * a;
+					aposta.textContent = 0;	
 				} else if (totalJogador == totalCasa) {
 					ctx.fillText('Houve um empate.', msgX, msgY);
+					banco.textContent = b + a;
+					aposta.textContent = 0;
 				} else {
 					ctx.fillText('Você perdeu!', msgX, msgY);
+					aposta.textContent = 0;
 				}
 			}
 		}
 	}
 	
 	function mostrarCasa() {
-		casaX = 500 - CARTA_W / 2;
+		casaX = 400 - CARTA_W / 2;
 		
 		for (var i = 0; i < maoCasa.length; i++) {
 			maoCasa[i].desenharFrente(casaX, casaY);
@@ -224,28 +265,61 @@
 	}
 	
 	function novaRodada() {
+		for (var i = 0; i < fichas.length; i++) {
+			fichas[i].disabled= false;
+		}
+		botNew.disabled = true;
+		
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		jogadorX = 100;
-		casaX = 500 - CARTA_W / 2;
+		casaX = 400 - CARTA_W / 2;
 		maoCasa = [];
 		maoJogador = [];
 		totalCasa = 0;
 		totalJogador = 0;
-		botDeal.disabled = false;
 		pontosCasa.textContent = 'Pontos da casa = ?';
 		darMaoInicial();
 	}	
+	
+	function apostar() {
+		var v = Number(this.value);
+		var b = Number(banco.textContent);
+		var a = Number(aposta.textContent);
+		if (b >= v) {
+			a += v;
+			aposta.textContent = a;
+			b -= v;
+			banco.textContent = b;
+		}
+		botDeal.disabled = false;
+		botHold.disabled = false;
+	}
 	
 	window.onload = init;	
 	</script>
 </head>
 <body>
-	<canvas id='canvas' width='1000' height='600'></canvas>
+	<canvas id='canvas' width='700' height='600'></canvas>
 	<br/>
 	<button id='deal'>Comprar</button>
 	<button id='hold'>Manter</button>
 	<button id='new'>Nova rodada</button>
-	<span id='ptsj'></span>
-	<span id='ptsc'>Pontos da casa = ?</span>
+	<div id='valores'>
+		Banco = R$ <span id='banco'>100</span>,00
+		<br/>
+		Aposta = R$ <span id='aposta'>0</span>,00
+	</div>
+	<div id='pontos'>
+		<span id='ptsj'></span>
+		<br/>
+		<span id='ptsc'>Pontos da casa = ?</span>
+	</div>
+	<div id='fichas'>
+		Fichas:<br/>
+		<button id='100' class='ficha' value=100>R$ 100,00</button>
+		<button id='50' class='ficha' value=50>R$ 50,00</button>
+		<button id='20' class='ficha' value=20>R$ 20,00</button>
+		<button id='10' class='ficha' value=10>R$ 10,00</button>
+	</div>
 </body>
 </html>
