@@ -23,7 +23,6 @@
 	}	
 	</style>
 	<script>
-	//implementar o que fazer quando o dinheiro acabar
 	//implementar o que fazer quando o baralho acabar
 	const DECK = new Image();
 	DECK.src = 'baralho.png';
@@ -95,8 +94,7 @@
 		if (this.topo < this.cartas.length) {
 			return this.cartas[++this.topo];
 		} else {
-			alert('Acabou as cartas do baralho.\
-				  Reinicie a página para começar com outro.')
+			return null;
 		}		
 	}
 	
@@ -200,7 +198,7 @@
 			darPara(maoCasa);
 		}
 		
-		mostrarCasa();
+		_mostrarCasa();
 		
 		var b = Number(banco.textContent);
 		var a = Number(aposta.textContent);
@@ -213,6 +211,8 @@
 			} else { // casa ganhou?
 				ctx.fillText('Você estourou os 21 pontos e perdeu.', msgX, msgY);
 				aposta.textContent = 0;
+				_processarDerrota();
+				
 			}			
 		} else { // jogador pode ganhar?
 			if (totalCasa > 21) { // casa perdeu?
@@ -231,20 +231,28 @@
 				} else {
 					ctx.fillText('Você perdeu!', msgX, msgY);
 					aposta.textContent = 0;
+					_processarDerrota()
 				}
 			}
 		}
-	}
-	
-	function mostrarCasa() {
-		casaX = 400 - CARTA_W / 2;
 		
-		for (var i = 0; i < maoCasa.length; i++) {
-			maoCasa[i].desenharFrente(casaX, casaY);
-			casaX += dX;
-			pontosCasa.textContent = 'Pontos da casa = ' + totalCasa;
+		function _processarDerrota() {
+			if (b == 0) {
+				alert ('Seu dinheiro acabou. Reinicie para um novo jogo.');
+				botNew.disabled = true;
+			}
 		}
-	}
+		
+		function _mostrarCasa() {
+			casaX = 400 - CARTA_W / 2;
+			
+			for (var i = 0; i < maoCasa.length; i++) {
+				maoCasa[i].desenharFrente(casaX, casaY);
+				casaX += dX;
+				pontosCasa.textContent = 'Pontos da casa = ' + totalCasa;
+			}
+		}
+	}	
 	
 	function somarPontos(mao) {
 		var soma = 0;
@@ -278,6 +286,7 @@
 		totalCasa = 0;
 		totalJogador = 0;
 		pontosCasa.textContent = 'Pontos da casa = ?';
+		
 		darMaoInicial();
 	}	
 	
