@@ -38,3 +38,35 @@ canvas {background: green;}
 	color: black;
 	background: blue;
 }
+
+@media screen and (orientation: portrait) {
+	body {font-size: 45px;}
+	
+	canvas {
+		background: green;
+		width: 100%;
+	}
+	
+	button {
+		width: 25%;
+		font-size: 25px;
+		padding: 2%;
+		margin: 2%;
+	}
+	
+	#valores {
+		position: absolute;
+		left: 5%;
+		top: 50%;
+	}
+	#pontos {
+		position: absolute;
+		left: 5%;
+		top: 60%;
+	}
+	#fichas {
+		position: absolute;
+		left: 5%;
+		top: 70%;
+	}
+}
