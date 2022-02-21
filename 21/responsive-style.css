@@ -1,0 +1,212 @@
+/*aplica opcionalmente as propriedades padrões*/
+body {
+	background: #ff8040;
+	font-size: 1em;
+}
+canvas {
+	background: green;
+}
+#valores, 
+#pontos,
+#fichas {
+	position: absolute;
+}
+.ficha {
+	font-weight: bold;
+	border-radius: 50%;
+}
+#ficha100 {
+	color: white;
+	background: black;
+}
+#ficha50 {
+	color: black;
+	background: red;
+}
+#ficha20 {
+	color: black;
+	background: green;
+}
+#ficha10 {
+	color: black;
+	background: blue;
+}
+
+/*para telas orientação retrato de 993px até 1024px de largura*/
+@media (max-device-width: 1024px) {
+	canvas {
+		width:  50vw;
+		height:  77.8645vh;
+	}
+	
+	#valores {
+		left:  51vw;
+		top:  1vh;
+	}
+	
+	#pontos {
+		left:  51vw;
+		top:  15vh;
+	}
+	
+	#fichas {
+		left:  51vw;
+		top:  60vh;
+	}
+	
+	.ficha {
+		height:  150px;
+		width:  150px;
+		border:  12px dashed white;
+	}
+}
+
+/*para telas orientação retrato de 769px até 992px de largura*/
+@media (max-device-width: 991px) {
+	canvas {
+		width:  96vw;
+		height: 45vh;
+	}
+	
+	#valores {
+		left:  5vw;
+		top:  62vh;
+	}
+	
+	#pontos {
+		left:  5vw;
+		top:  68vh;
+	}
+	
+	#fichas {
+		left:  5vw;
+		top:  74vh;
+	}
+	
+	.ficha {
+		font-size: 0.5em;
+		height:  75px;
+		width:  75px;
+		border:  8px dashed white;
+	}
+}
+
+/*para telas orientação retrato de 481px até 768px de largura*/
+@media (max-device-width: 768px) {
+	canvas {
+		width:  96vw;
+		height: 45vh;
+	}
+	
+	#valores {
+		left:  5vw;
+		top:  57vh;
+	}
+	
+	#pontos {
+		left:  5vw;
+		top:  64vh;
+	}
+	
+	#fichas {
+		left:  5vw;
+		top:  71vh;
+	}
+	
+	.ficha {
+		font-size: 0.5em;
+		height:  75px;
+		width:  75px;
+		border:  8px dashed white;
+	}
+}
+
+/*para telas orientação retrato de 321px até 480px de largura*/
+@media (max-device-width: 480px) {
+	canvas {
+		width:  96vw;
+		height: 45vh;
+	}
+	
+	#valores {
+		left:  5vw;
+		top:  53vh;
+	}
+	
+	#pontos {
+		left:  5vw;
+		top:  64vh;
+	}
+	
+	#fichas {
+		left:  5vw;
+		top:  76vh;
+	}
+	
+	.ficha {
+		font-size: 0.5em;
+		height:  75px;
+		width:  75px;
+		border:  8px dashed white;
+	}
+}
+
+/*para telas orientação retrato até 320px de largura*/
+@media (max-device-width: 320px) {
+	canvas {
+		width:  96vw;
+		height: 45vh;
+	}
+	
+	#valores {
+		left:  5vw;
+		top:  53vh;
+	}
+	
+	#pontos {
+		left:  5vw;
+		top:  62vh;
+	}
+	
+	#fichas {
+		left:  5vw;
+		top:  71vh;
+	}
+	
+	.ficha {
+		font-size: 0.5em;
+		height:  75px;
+		width:  75px;
+		border:  8px dashed white;
+	}
+}
+
+/*para orientação paisagem ou para telas maiores que 1024px de largura */
+@media (orientation: landscape), (min-device-width: 1024px) {
+	canvas {
+		width:  50vw;
+		height:  77.8645vh;
+	}
+	
+	#valores {
+		left:  51vw;
+		top:  1vh;
+	}
+	
+	#pontos {
+		left:  51vw;
+		top:  15vh;
+	}
+	
+	#fichas {
+		left:  51vw;
+		top:  60vh;
+	}
+	
+	.ficha {
+		height:  150px;
+		width:  150px;
+		border:  12px dashed white;
+	}
+}
+
