@@ -95,6 +95,9 @@ var totalCasa = 0; // total de pontos da casa
 var totalJogador = 0; // total de pontos do jogador
 var msgX = 30; // a posisão x da mensagem
 var msgY = 50; // a posisão y da mensagem
+var divValores; // div com os valores do banco (dinheiro do jogador e aposta)
+var divPontos; // div com os pontos das cartas
+var divFichas; // div com as figuras das fichas
 
 function init() {
 	canvas = document.getElementById('canvas');
@@ -106,6 +109,9 @@ function init() {
 	pontosCasa = document.getElementById('ptsc');
 	banco = document.getElementById('banco');
 	aposta = document.getElementById('aposta');
+	divValores = document.getElementById('valores');
+	divPontos = document.getElementById('pontos');
+	divFichas = document.getElementById('fichas');
 	
 	fichas = document.getElementsByClassName('ficha');
 	for (var i = 0; i < fichas.length; i++) {
@@ -118,6 +124,18 @@ function init() {
 	botDeal.disabled = true;
 	botHold.disabled = true;
 	botNew.disabled = true;
+	
+	var rpsv = new Responsivo();
+	
+	rpsv.novaFuncaoDefault(dflt);
+	rpsv.novaFuncaoMax320(max320);
+	rpsv.novaFuncaoMax480(max480);
+	rpsv.novaFuncaoMax768(max768);
+	rpsv.novaFuncaoMax992(max992);
+	rpsv.novaFuncaoMax1024(max1024);
+	rpsv.novaFuncaoMin1024(min1024);
+	
+	rpsv.ajustarResponsividade();
 	
 	ctx.font = 'italic 20pt Georgia';
 	
@@ -291,5 +309,142 @@ function _somarPontos(mao) {
 	
 	return soma;
 }	
+
+/*
+*funções para design responsivo de largura de telas
+*/
+
+function dflt() {
+	document.body.style.background = '#ff8040';
+	document.body.style.fontSize = '1em';
+	
+	canvas.style.background =  'green';
+	
+	divValores.style.position =  'absolute';
+	divPontos.style.position =  'absolute';
+	divFichas.style.position =  'absolute';
+	
+	for (var i = 0; i < fichas.length; i++) {
+		fichas[i].style.fontWeight =  'bold';
+		fichas[i].style.borderRadius =  '50%';
+	}
+
+	fichas[0].style.color =  'white';
+	fichas[0].style.background =  'black';
+	
+	fichas[1].style.color =  'black';
+	fichas[1].style.background =  'red';
+	
+	fichas[2].style.color =  'black';
+	fichas[2].style.background =  'green';
+	
+	fichas[3].style.color =  'black';
+	fichas[3].style.background =  'blue';
+}
+
+function max320() {	
+	canvas.style.width =  '96vw';
+	 
+	divValores.style.left =  '5vw';
+	divValores.style.top =  '53vh';
+	
+	divPontos.style.left =  '5vw';
+	divPontos.style.top =  '62vh';
+	
+	divFichas.style.left =  '5vw';
+	divFichas.style.top =  '71vh';
+	
+	for (var i = 0; i < fichas.length; i++) {
+		fichas[i].style.fontSize =  '0.5em';
+		fichas[i].style.height =  '75px';
+		fichas[i].style.width =  '75px';
+		fichas[i].style.border =  '8px dashed white';
+	}	
+}
+
+function max480() {
+	canvas.style.width =  '96vw';
+	 
+	divValores.style.left =  '5vw';
+	divValores.style.top =  '53vh';
+	
+	divPontos.style.left =  '5vw';
+	divPontos.style.top =  '64vh';
+	
+	divFichas.style.left =  '5vw';
+	divFichas.style.top =  '76vh';
+	
+	for (var i = 0; i < fichas.length; i++) {
+		fichas[i].style.fontSize =  '0.5em';
+		fichas[i].style.height =  '75px';
+		fichas[i].style.width =  '75px';
+		fichas[i].style.border =  '8px dashed white';
+	}
+}
+
+function max768() {
+	canvas.style.width =  '78vw';
+	 
+	divValores.style.left =  '5vw';
+	divValores.style.top =  '57vh';
+	
+	divPontos.style.left =  '5vw';
+	divPontos.style.top =  '64vh';
+	
+	divFichas.style.left =  '5vw';
+	divFichas.style.top =  '71vh';
+	
+	for (var i = 0; i < fichas.length; i++) {
+		fichas[i].style.fontSize =  '0.5em';
+		fichas[i].style.height =  '75px';
+		fichas[i].style.width =  '75px';
+		fichas[i].style.border =  '8px dashed white';
+	}
+}
+
+function max992() {
+	canvas.style.width =  '96vw';
+	 
+	divValores.style.left =  '5vw';
+	divValores.style.top =  '62vh';
+	
+	divPontos.style.left =  '5vw';
+	divPontos.style.top =  '68vh';
+	
+	divFichas.style.left =  '5vw';
+	divFichas.style.top =  '74vh';
+	
+	for (var i = 0; i < fichas.length; i++) {
+		fichas[i].style.fontSize =  '0.5em';
+		fichas[i].style.height =  '75px';
+		fichas[i].style.width =  '75px';
+		fichas[i].style.border =  '8px dashed white';
+	}
+}
+
+function max1024() {
+	canvas.style.width =  '50vw';
+	canvas.style.height =  '77.8645vh';
+	
+	divValores.style.left =  '51vw';
+	divValores.style.top =  '1vh';
+	
+	divPontos.style.left =  '51vw';
+	divPontos.style.top =  '15vh';
+	
+	divFichas.style.left =  '51vw';
+	divFichas.style.top =  '60vh';
+	
+	for (var i = 0; i < fichas.length; i++) {
+		fichas[i].style.height =  '150px';
+		fichas[i].style.width =  '150px';
+		fichas[i].style.border =  '12px dashed white';
+	}
+}
+
+function min1024() {
+	max1024();
+}
+
 
 window.onload = init;	
