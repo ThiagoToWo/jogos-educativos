@@ -1,0 +1,32 @@
+body {
+	background: #ff8040;
+	font-size: 1em;
+}
+canvas {
+	background: green;
+}
+#valores, 
+#pontos,
+#fichas {
+	position: absolute;
+}
+.ficha {
+	font-weight: bold;
+	border-radius: 50%;
+}
+#ficha100 {
+	color: white;
+	background: black;
+}
+#ficha50 {
+	color: black;
+	background: red;
+}
+#ficha20 {
+	color: black;
+	background: green;
+}
+#ficha10 {
+	color: black;
+	background: blue;
+}
