@@ -1,7 +1,7 @@
 const DECK = new Image();
 DECK.src = 'baralho.png';
-const CARTA_W = 960 / 13;
-const CARTA_H = 575 / 5;
+const CARTA_W = 960 / 13; // = 73,84615
+const CARTA_H = 575 / 5; // = 115
 
 // classe Carta
 function Carta(naipe, simbolo, valor, linha, coluna) {

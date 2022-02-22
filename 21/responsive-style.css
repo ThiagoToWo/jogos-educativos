@@ -189,24 +189,24 @@ canvas {
 	}
 	
 	#valores {
-		left:  51vw;
+		left:  55vw;
 		top:  1vh;
 	}
 	
 	#pontos {
-		left:  51vw;
+		left:  55vw;
 		top:  15vh;
 	}
 	
 	#fichas {
-		left:  51vw;
+		left:  55vw;
 		top:  60vh;
 	}
 	
 	.ficha {
-		height:  150px;
-		width:  150px;
-		border:  12px dashed white;
+		height:  100px;
+		width:  100px;
+		border:  10px dashed white;
 	}
 }
 
