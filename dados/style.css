@@ -1,0 +1,25 @@
+body {
+	background-color: #99ff99;
+}
+canvas {
+	width: 100%;
+	background-color: green;
+}
+#infos {
+	margin-left: 2px;
+}
+article {
+	border: 2px solid;
+	padding: 10px;
+	text-align: left;
+	display: block;
+	margin: 10px;
+}
+
+@media (orientation: landscape), (min-width: 1024px) {
+	body {text-align: center}
+	canvas {
+		width: auto;
+		background-color: green;
+	}
+}

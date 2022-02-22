@@ -4,204 +4,8 @@
 	<title>Craps</title>
 	<meta name='viewport' content='width=device-width initial-scale=1'/>
 	<meta charset='utf-8'/>
-	<script>
-		var ctx; // contexto 2d
-		const DX = 25; // coordenada x do primeiro dados
-		const DY = 100; // coordenada y do primeiro dados
-		const DW = 100; // largura do dados
-		const DH = 100; // altura do dado
-		const RP = 6; // raio do ponto
-		var dx, dy; // cordenadas variáveis dos dados
-		var primeiroLance = true;				
-		var ponto;
-		
-		function jogar() {
-			var soma = 0;
-			dx = DX;
-			dy = DY;
-			var face = 1 + Math.floor(Math.random() * 6);
-			//var face = 5;
-			soma += face;
-			desenhar(face);
-			face = 1 + Math.floor(Math.random() * 6);
-			//var face = 3;
-			soma += face;
-			dx = DX + 150;
-			desenhar(face);
-			
-			if (primeiroLance) {
-				var banco = Number(document.f.bank.value);
-				if (banco < 10) {
-					alert('Deposite mais dinheiro prara jogar.');
-					return;
-				}
-				banco -= 10;
-				document.f.bank.value = banco;
-				
-				switch (soma) {
-					case 7:
-					case 11:
-						document.f.outcome.value = 'Você venceu!';
-						var banco = Number(document.f.bank.value);
-						banco += 20;
-						document.f.bank.value = banco;
-						break;
-					case 2:
-					case 3:
-					case 12:
-						document.f.outcome.value = 'Você perdeu!';						
-						break;
-					default:
-						ponto = soma;
-						document.f.stage.value = 'Precisa lançar de novo.';
-						document.f.point.value = ponto;
-						document.f.outcome.value = ''
-						primeiroLance = false;
-				}
-			} else {
-				switch(soma) {
-					case 7:
-						document.f.outcome.value = 'Você perdeu!'
-						document.f.stage.value = 'Volte a primeira jogada.'
-						document.f.point.value = '';
-						primeiroLance = true;
-						break
-					case ponto:
-						document.f.outcome.value = 'Você venceu!'
-						document.f.stage.value = 'Volte a primeira jogada.'
-						document.f.point.value = '';
-						var banco = Number(document.f.bank.value);
-						banco += 20;
-						document.f.bank.value = banco;
-						primeiroLance = true;
-						break;
-				}
-			}
-		}
-		
-		function desenhar(n) {	
-			ctx = document.getElementById('canvas').getContext('2d');
-			ctx.lineWidth = 5;
-			ctx.clearRect(dx, dy, DW, DH);
-			ctx.strokeRect(dx, dy, DW, DH);
-			ctx.fillStyle = 'green';
-			
-			ctx.save();
-			ctx.fillStyle = 'white';
-			ctx.fillRect(dx, dy, DW, DH);
-			ctx.restore();
-			
-			switch(n) {
-				case 1:
-					desenhar1();
-					break;
-				case 2:
-					desenhar2();
-					break;
-				case 3:
-					desenhar2();
-					desenhar1();
-					break;
-				case 4:
-					desenhar4();
-					break;
-				case 5:
-					desenhar4();
-					desenhar1();
-					break;
-				case 6:
-					desenhar4();
-					desenhar2meio();
-					break;
-			}
-		}
-		
-		function desenhar1() {
-			var x;
-			var y;
-			ctx.beginPath();
-			x = dx + .5 * DW;
-			y = dy + .5 * DH;
-			ctx.arc(x, y, RP, 0, 2 * Math.PI);			
-			ctx.closePath();
-			ctx.fill();
-			ctx.restore();
-		}
-		
-		function desenhar2() {
-			var x;
-			var y;
-			
-			ctx.beginPath();
-			x = dx + 3 * RP;
-			y = dy + 3 * RP;
-			ctx.arc(x, y, RP, 0, 2 * Math.PI);
-			ctx.closePath();
-			ctx.fill();
-			
-			ctx.beginPath();
-			x = dx + DW - 3 * RP;
-			y = dy + DH - 3 * RP;
-			ctx.arc(x, y, RP, 0, 2 * Math.PI);	
-			ctx.closePath();
-			ctx.fill();
-		}
-		
-		function desenhar4() {
-			desenhar2();
-			
-			var x;
-			var y;
-			
-			ctx.beginPath();
-			x = dx + 3 * RP;
-			y = dy + DH - 3 * RP;
-			ctx.arc(x, y, RP, 0, 2 * Math.PI);
-			ctx.closePath();
-			ctx.fill();
-			
-			ctx.beginPath();
-			x = dx + DW - 3 * RP;
-			y = dy + 3 * RP;
-			ctx.arc(x, y, RP, 0, 2 * Math.PI);	
-			ctx.closePath();
-			ctx.fill();
-		}
-		
-		function desenhar2meio() {
-			var x;
-			var y;
-			
-			ctx.beginPath();
-			x = dx + 3 * RP;
-			y = dy + .5 * DH;
-			ctx.arc(x, y, RP, 0, 2 * Math.PI);
-			ctx.closePath();
-			ctx.fill();
-			
-			ctx.beginPath();
-			x = dx + DW - 3 * RP;
-			y = dy + .5 * DH;
-			ctx.arc(x, y, RP, 0, 2 * Math.PI);	
-			ctx.closePath();
-			ctx.fill();
-		}
-	</script>
-	<style>
-		body {
-			text-align: center;
-		}
-		canvas {
-			background-color: green;
-		}
-		article {
-			border: 2px solid;
-			padding: 10px;
-			text-align: left;
-			display: block;
-			margin: 10px;
-		}
-	</style>
+	<script src='script.js'></script>
+	<link rel='stylesheet' href='style.css'>
 </head>
 <body>
 	<canvas id='canvas' width=300 height=300>
@@ -209,15 +13,15 @@
 	</canvas>
 	<br/>
 	<button onClick='jogar();'>Jogar dados</button>
-	<form name='f'>	
-		Banco: <input name='bank' value='100'/>
+	<div id='infos'>	
+		Banco: <span id='bank'>100</span>
 		<br/>
-		Estágio: <input name='stage' value='Primeiro lançamento'/>
+		Estágio: <span id='stage'>Primeiro lançamento</span>
 		<br/>
-		Pontos: <input name='point' value=''/>
+		Pontos: <span id='point' value=''></span>
 		<br/>
-		Resultado: <input name='outcome' value=''/>		
-	</form>
+		Resultado: <span id='outcome' value=''></span>		
+	</div>
 	<article>
 		<h3> Regras do jogo de craps </h3>
 		<p> O jogador aposta 10 reais a cada primeira jogada e rola dois dados observando a soma dos valores das faces.</p>
