@@ -1,0 +1,33 @@
+body {
+	background: #eeeeee;
+}
+canvas {
+	
+}
+.letra {
+	position: relative;
+	display: inline-block;
+	border: 2px double black;
+	margin: 5px;
+	padding: 5px;
+	color: #f00;
+	background-color: #0fc;
+	font-family: 'Courier New', Courier, monospace;
+}
+.lacuna {
+	position: relative;
+	border: none;
+	margin: 5px;
+	padding: 5px;
+	color: black;
+	background-color: #eeeeee;
+	font-family: 'Courier New', Courier, monospace;
+}
+#lacunas {
+	width: 95%;
+	white-space: nowrap;
+	overflow: scroll;	
+}
+#letras {
+	width: 100%;
+}
