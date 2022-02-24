@@ -32,6 +32,7 @@ canvas {
 	width: 100%;
 }
 article {
+	overflow: auto;	
 	border: 2px solid;
 	padding: 10px;
 	text-align: left;
