@@ -26,8 +26,15 @@ canvas {
 #lacunas {
 	width: 95%;
 	white-space: nowrap;
-	overflow: scroll;	
+	overflow: auto;	
 }
 #letras {
 	width: 100%;
+}
+article {
+	border: 2px solid;
+	padding: 10px;
+	text-align: left;
+	display: block;
+	margin: 10px;
 }
