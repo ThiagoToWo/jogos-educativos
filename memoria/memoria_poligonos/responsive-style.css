@@ -1,0 +1,52 @@
+/*aplica opcionalmente as propriedades padrões*/
+body {background-color: #ff7396;}
+canvas {
+    width: auto;
+    height: 40vh;
+}
+div {
+	width: 95%;
+    background-color: pink;
+	padding: 5px;
+}
+
+/*para telas orientação retrato de 769px até 992px de largura*/
+@media (max-device-width: 991px) {
+	canvas {
+		width: 96vw;
+		height: auto;
+	}
+	div {
+		width: 77vw;
+	}
+}
+
+/*para telas orientação retrato de 481px até 768px de largura*/
+@media (max-device-width: 768px) {
+	canvas {
+		width: 96vw;
+		height: auto;
+	}
+	div {
+		width: 86vw;
+	}
+}
+
+/*para telas orientação retrato até 320px de largura*/
+@media (max-device-width: 320px) {
+	div {
+		width: 100vw;
+	}
+}
+
+/*para orientação paisagem ou para telas maiores que 1024px de largura */
+@media (orientation: landscape), (min-device-width: 1024px) {
+	canvas {
+		width: 65vw;
+		height: auto;
+	}
+	div {
+		width: 65vw;
+	}
+}
+
