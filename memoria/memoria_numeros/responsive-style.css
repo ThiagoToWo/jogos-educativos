@@ -2,6 +2,9 @@
 body {
 	background-color: #ff7396;
 }
+button {	
+	font-size: 70px;
+}
 #canvas {
 	position: relative;
     width: auto;
