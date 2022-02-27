@@ -1,51 +1,60 @@
 /*aplica opcionalmente as propriedades padrões*/
-body {background-color: #ff7396;}
-canvas {
+body {
+	background-color: #ff7396;
+}
+#canvas {
+	position: relative;
     width: auto;
     height: 40vh;
+	display: block;
 }
-div {
+#resultados {
+	position: absolute;
+	top: 750px;
 	width: 95%;
     background-color: pink;
 	padding: 5px;
+	display: block;
 }
 
 /*para telas orientação retrato de 769px até 992px de largura*/
 @media (max-device-width: 991px) {
-	canvas {
+	#canvas {
 		width: 96vw;
 		height: auto;
 	}
-	div {
+	#resultados {		
 		width: 77vw;
 	}
 }
 
 /*para telas orientação retrato de 481px até 768px de largura*/
 @media (max-device-width: 768px) {
-	canvas {
+	#canvas {
 		width: 96vw;
 		height: auto;
 	}
-	div {
+	#resultados {
 		width: 86vw;
 	}
 }
 
 /*para telas orientação retrato até 320px de largura*/
 @media (max-device-width: 320px) {
-	div {
+	#resultados {
 		width: 100vw;
 	}
 }
 
 /*para orientação paisagem ou para telas maiores que 1024px de largura */
 @media (orientation: landscape), (min-device-width: 1024px) {
-	canvas {
+	#canvas {
 		width: 65vw;
 		height: auto;
 	}
-	div {
+	#resultados {
+		position: absolute;
+		top: 690px;
 		width: 65vw;
 	}
 }
