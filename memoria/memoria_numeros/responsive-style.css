@@ -1,12 +1,13 @@
 /*aplica opcionalmente as propriedades padrões*/
 body {
+	font-size: 1.2em;
 	background-color: #ff7396;
 }
 button {	
 	font-size: 3em;
 }
 #novoJogo {
-	font-size: 1em;
+	font-size: 1.2em;
 }
 #canvas {
 	position: relative;
@@ -16,7 +17,7 @@ button {
 }
 #resultados {
 	position: absolute;
-	top: 115vh;
+	top: 750px;
 	width: 95%;
     background-color: pink;
 	padding: 5px;
@@ -41,14 +42,14 @@ button {
 		height: auto;
 	}
 	#resultados {
-		width: 86vw;
+		width: 90vw;
 	}
 }
 
 /*para telas orientação retrato até 320px de largura*/
 @media (max-device-width: 320px) {
 	#resultados {
-		width: 100vw;
+		width: 130vw;
 	}
 }
 
@@ -60,7 +61,7 @@ button {
 	}
 	#resultados {
 		position: absolute;
-		top: 690px;
+		top: 750px;
 		width: 65vw;
 	}
 }
