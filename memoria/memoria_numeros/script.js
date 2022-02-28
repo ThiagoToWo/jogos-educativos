@@ -150,8 +150,8 @@ function virarCarta() {
 		desenharCostas(c1);
 		desenharCostas(c2);
 	} else {
-		c1.style.display = 'none';
-		c2.style.display = 'none';
+		c1.style.visibility = 'hidden';
+		c2.style.visibility = 'hidden';
 	}
 	
 	c1.addEventListener('click', escolher, false); // Reativa a possibilidade de escolha.
