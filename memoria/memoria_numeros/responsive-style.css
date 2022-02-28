@@ -11,14 +11,11 @@ button {
 }
 #canvas {
 	position: relative;
-    width: auto;
-    height: 40vh;
 	display: block;
 }
 #resultados {
 	position: absolute;
 	top: 750px;
-	width: 95%;
     background-color: pink;
 	padding: 5px;
 	display: block;
@@ -28,7 +25,6 @@ button {
 @media (max-device-width: 991px) {
 	#canvas {
 		width: 96vw;
-		height: auto;
 	}
 	#resultados {		
 		width: 77vw;
@@ -39,7 +35,6 @@ button {
 @media (max-device-width: 768px) {
 	#canvas {
 		width: 96vw;
-		height: auto;
 	}
 	#resultados {
 		width: 90vw;
@@ -57,7 +52,6 @@ button {
 @media (orientation: landscape), (min-device-width: 1024px) {
 	#canvas {
 		width: 65vw;
-		height: auto;
 	}
 	#resultados {
 		position: absolute;
