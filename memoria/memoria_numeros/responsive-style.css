@@ -5,6 +5,9 @@ body {
 button {	
 	font-size: 3em;
 }
+#novoJogo {
+	font-size: 1em;
+}
 #canvas {
 	position: relative;
     width: auto;
@@ -57,7 +60,7 @@ button {
 	}
 	#resultados {
 		position: absolute;
-		top: 97vh;
+		top: 690px;
 		width: 65vw;
 	}
 }

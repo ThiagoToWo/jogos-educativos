@@ -133,6 +133,8 @@ function escolher(e) {
 				var intervalo = Math.floor(0.5 + (jogo_t - jogo_t0) / 1000);
 				
 				document.getElementById('tempo').innerHTML = intervalo + 's';
+				
+				oferecerNovoJogo();
 			}
 		} else { // Não teve combinação.
 			combinou = false;
@@ -156,4 +158,19 @@ function virarCarta() {
 	
 	c1.addEventListener('click', escolher, false); // Reativa a possibilidade de escolha.
 	c2.addEventListener('click', escolher, false); // Reativa a possibilidade de escolha.
+}
+
+function oferecerNovoJogo() {
+	var botaoNovoJogo = document.createElement('button');
+	botaoNovoJogo.id = 'novoJogo';
+	botaoNovoJogo.innerText = 'Novo Jogo';
+	botaoNovoJogo.onclick = function() {
+		window.location.reload(true);
+	}
+	
+	botaoNovoJogo.style.position = 'absolute';
+	botaoNovoJogo.style.top = '270px';
+	botaoNovoJogo.style.left = '130px';
+	
+	document.body.appendChild(botaoNovoJogo);
 }
