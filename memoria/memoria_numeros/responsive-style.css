@@ -3,7 +3,7 @@ body {
 	background-color: #ff7396;
 }
 button {	
-	font-size: 70px;
+	font-size: 3em;
 }
 #canvas {
 	position: relative;
@@ -13,7 +13,7 @@ button {
 }
 #resultados {
 	position: absolute;
-	top: 750px;
+	top: 115vh;
 	width: 95%;
     background-color: pink;
 	padding: 5px;
@@ -57,7 +57,7 @@ button {
 	}
 	#resultados {
 		position: absolute;
-		top: 690px;
+		top: 97vh;
 		width: 65vw;
 	}
 }
