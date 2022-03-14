@@ -1,0 +1,8 @@
+form {
+	width: 330px;
+	margin: 20px;
+	background-color: brown;
+	padding: 20px;
+}
+input:valid {background: green;}
+input:invalid {background: red;}
