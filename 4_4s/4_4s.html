@@ -1,0 +1,219 @@
+<!doctype html>
+<html>
+<head>
+	<title>Os quatro quatros</title>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+	<style>
+	body {
+		text-align: center;
+		background: rgb(40, 90, 70);
+	}
+	.grande {
+		padding: 5px;
+		margin-top: 10px;
+		margin-right: 10px;
+		width: 50px;
+		font-size: 50;		
+	}	
+	</style>
+	<script>
+	var expressao; // input da expressão
+	var resultado; // span com o resultado da expressão
+	var simbolos; // array de símbolos digitados
+	/*
+	* botoes de entrada de valores
+	* botoes[0] botão 4
+	* botoes[1] botão 44
+	* botoes[2] botão 444
+	* botoes[3] botão +
+	* botoes[4] botão -
+	* botoes[5] botão *
+	* botoes[6] botão /
+	* botoes[7] botão (
+	* botoes[8] botão )
+	*/	
+	var botoes; 
+	var botDfz; // botão desfazer
+	var botLmp; // botão limpar
+	var botIgl; // botão =	
+	var botRsv; // botão ?
+	var acertos; // caixa de diálogo com os valores acertados
+	var botFch; // botão para fechar caixa de diálogo
+	var quatros; // quantidade de quatros digitados
+	
+	function init() {
+		expressao = document.getElementById('exp');		
+		resultado = document.getElementById('rst');		
+		botoes = document.getElementsByTagName('button');
+		botDfz = document.getElementById('desfazer');
+		botLmp = document.getElementById('limpar');
+		botIgl = document.getElementById('=');
+		botRsv = document.getElementById('resolvidos');
+		acertos = document.getElementById('acertos');
+		botFch = document.getElementById('fechar');
+		
+		/* 
+		* adiciona, para todos os botões, exceto desfazer e igual, 
+		* a função de escrever seu valor na entrada. Para os primeiros
+		* três botões (4, 44 e 444), define a função que escreve o valor
+		* e conta os quatros já escritos
+		*/
+		for (var i = 0; i <= 8; i++) {
+			if (i <= 2) {
+				botoes[i].onclick = escreverValorEContarQuatros;
+			} else {
+				botoes[i].onclick = escreverValor;
+			}
+		}
+		
+		botDfz.onclick = desfazerUltimoSimbolo;		
+		botLmp.onclick = limparExpressão;		
+		botIgl.onclick = avaliarExpressão;
+		botIgl.disabled = true;
+		botRsv.onclick = vizualizarResolvidos;
+		
+		quatros = 0;
+		simbolos = [];
+	}
+	
+	function escreverValor() {
+		expressao.value += this.value;
+		simbolos.push(this.value);
+	}
+	
+	function escreverValorEContarQuatros() {
+		expressao.value += this.value;
+		simbolos.push(this.value);
+		contarQuatros(this);
+	}	
+	
+	function contarQuatros(elemento) {
+		var simbolo;
+		
+		if (elemento.nodeName == 'BUTTON') { // se o elemento for um botão usa seu value
+			simbolo = elemento.value;
+		} else { // se for um valor qualquer, usa ele.
+			simbolo = elemento;
+		}
+		
+		if (simbolo == '4') { // botão 4 clicado
+			quatros++;			
+		} else if (simbolo == '44') { // botão 44 clicado
+			quatros += 2;
+			botoes[2].disabled = true; // desabilita o botão 444
+		} else if (simbolo == '444'){ // botão 444 clicado
+			quatros += 3;
+			botoes[1].disabled = true; // desabilita o botão 44
+			botoes[2].disabled = true; // desabilita o botão 444
+		}
+
+		// conta os quatros para ver quais botões bloqueiam
+		if (quatros == 2) { 
+			botoes[2].disabled = true; // desabilita o botão 444
+		} else if (quatros == 3) {
+			botoes[1].disabled = true; // desabilita o botão 44
+			botoes[2].disabled = true; // desabilita o botão 444
+		} else if (quatros == 4) {
+			botoes[0].disabled = true; // desabilita o botão 4
+			botoes[1].disabled = true; // desabilita o botão 44
+			botoes[2].disabled = true; // desabilita o botão 444
+			botIgl.disabled = false; // habilita o botão de avaliar
+		}
+	}
+
+	function avaliarExpressão() {
+		var express = expressao.value;
+		var valor = eval(express);
+		
+		resultado.innerHTML = valor;
+		
+		if (valor > 0 && valor <= 100) {
+			localStorage.setItem(valor, express);
+		}
+	};
+	
+	function desfazerUltimoSimbolo() {
+		simbolos.pop();		
+			
+		botoes[0].disabled = false; // reabilita o botão 4
+		botoes[1].disabled = false; // reabilita o botão 44
+		botoes[2].disabled = false; // reabilita o botão 444
+
+		expressao.value = '';
+		resultado.innerHTML = '';	
+		quatros = 0;
+		botIgl.disabled = true;
+			
+		for (var i = 0; i < simbolos.length; i++) {
+			expressao.value += simbolos[i];
+			contarQuatros(simbolos[i]);
+		}
+	}
+	
+	function limparExpressão() {
+		expressao.value = '';
+		resultado.innerHTML = '';
+		quatros = 0;
+		simbolos = [];
+		botIgl.disabled = true;
+		
+		botoes[0].disabled = false; // reabilita o botão 4
+		botoes[1].disabled = false; // reabilita o botão 44
+		botoes[2].disabled = false; // reabilita o botão 444
+	}
+	
+	function vizualizarResolvidos() {
+		var expressao;
+		// primeiro adiciona o botão de fechar
+		var string_corretas = "<button id='fechar' onclick='fecharCaixaDeDialogo();'>Fechar</button><br/><br/>"
+		
+		// depois escreve as expressões que já foram feitas corretamente
+		for (var i = 1; i <= 100; i++) {
+			expressao = localStorage.getItem(i)
+			if (expressao != null) {
+				string_corretas += i + ': ' + expressao + '<br/>';
+			} else {
+				string_corretas += i + ': ' + '_________'+ '<br/>';
+			}
+		}		
+		
+		// adiciona no html do dialog e mostra ele
+		acertos.innerHTML = string_corretas;	
+		acertos.showModal();
+	}
+	
+	function fecharCaixaDeDialogo() {
+		acertos.close();
+	}
+	
+	window.onload = init;
+	</script>
+</head>
+<body>
+<h1>Os quatro quatros</h1>
+<h4> Forme os números de 1 a 100 usando apenas quatro
+ algarismos 4 e as quatro operações básicas.</h4>
+<input type='text' id='exp' disabled></input><br/>
+<b>Resultado = <b/> 
+<span id='rst'></span>
+<div id='botoes'>
+	<button class='grande' id='4' value='4'>4</button>
+	<button class='grande' id='44' value='44'>44</button>
+	<button class='grande' id='444' value='444'>444</button>
+</div>
+<div id='operacoes'>
+	<button class='grande' id='+' value='+'>+</button>
+	<button class='grande' id='-' value='-'>-</button><br/>
+	<button class='grande' id='*' value='*'>*</button>
+	<button class='grande' id='/' value='/'>/</button><br/>
+	<button class='grande' id='(' value='('>(</button>
+	<button class='grande' id=')' value=')'>)</button><br/>
+	<button class='grande' id='desfazer'>&larr;</button>
+	<button class='grande' id='limpar'>CE</button><br/>
+	<button class='grande' id='='>=</button>
+</div>
+<button class='grande' id='resolvidos'>?</button>
+<dialog id='acertos'></dialog>
+</body>
+</html>
