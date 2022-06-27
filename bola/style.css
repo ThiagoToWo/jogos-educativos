@@ -1,8 +1,25 @@
+body {
+	text-align: center;
+	font-family: Arial;
+	font-weight: bold;
+	color: #282828;
+}
 form {
 	width: 330px;
-	margin: 20px;
-	background-color: brown;
-	padding: 20px;
+	margin: 20px auto;
+	background-color: #b0b0b0;
+	padding: 16px;
+	border-radius: 4px;
+	text-align:right;
 }
-input:valid {background: green;}
-input:invalid {background: red;}
+input {
+	border: 1px solid #6a6a6a;
+	padding: 2px;
+	margin-top: 6px;
+}
+input:valid {background: #88bb88;}
+input:invalid {background: #bb8888;}
+input[type=submit] {
+	padding: 8px 24px;
+	border-radius: 4px;
+}
