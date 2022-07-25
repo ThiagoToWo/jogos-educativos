@@ -229,8 +229,10 @@
 			configurarMouse(e);
 			
 			var distsqr = (mouse_x - bala.x)**2 + (mouse_y - bala.y)**2;
+			//console.log("mx:", mouse_x, "my:", mouse_y, "bx:", bala.x, "by:", bala.y, "br:", bala.r, "d²", distsqr, "br²", bala.r**2)
 			
 			if (distsqr < (bala.r)**2) {
+				//console.log("na bola")
 				mouse_move = true;
 				seta.ativada = true;
 				seta.atualizar();
@@ -265,11 +267,13 @@
 		
 		function configurarMouse(e) {
 			if (e.layerX || e.layerX == 0) {
-				mouse_x = e.layerX;
-				mouse_y = e.layerY;
+				mouse_x = e.layerX - canvas.offsetLeft;
+				mouse_y = e.layerY - canvas.offsetTop;
+				// console.log("layerX:", mouse_x, "layerY:", mouse_y);
 			} else if (e.offsetX || e.offsetX == 0) {
-				mouse_x = e.offsetX;
-				mouse_y = e.offsetY;
+				mouse_x = e.offsetX - canvas.offsetLeft;
+				mouse_y = e.offsetY - canvas.offsetTop;
+				// console.log("offsetX:", mouse_x, "offsetY:", mouse_y);
 			}
 		}
 		
@@ -435,9 +439,7 @@
 			border: 5px green double;
 			padding: 10px;
 			display: inline-table;
-		}		
-		#formulas{width: ;}
-		#exemplo1{width: ;}
+		}
 		#exemplo2{width: 450px;}
 	</style>
 </head>
