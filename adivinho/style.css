@@ -1,0 +1,12 @@
+body {
+    text-align: center;
+    background-color: #dff;
+}
+
+.fonte-grande {
+    font-size: 200px;
+}
+
+button {
+    margin: 5px;
+}
