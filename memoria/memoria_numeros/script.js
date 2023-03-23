@@ -113,11 +113,15 @@ function escolher(e) {
 		primeiraEscolha = false;					
 		
 		desenharFrente(primeiraCarta);
+
+		e.target.removeEventListener('click', escolher, false); // impede de escolher a mesma carta outra vez
 	} else { // Caso contrário.	
 		tentativas++;
 		document.getElementById('tent').innerHTML = tentativas;
 		
-		this.removeEventListener('click', escolher, false); // Desativa as possibilidades de escolhas a mais.
+		for (var c of deck) { // Desativa as possibilidades de escolha de mais de duas cartas.
+			c.removeEventListener("click", escolher, false);
+		} 
 		
 		segundaCarta = this;
 		
@@ -156,8 +160,9 @@ function virarCarta() {
 		c2.style.visibility = 'hidden';
 	}
 	
-	c1.addEventListener('click', escolher, false); // Reativa a possibilidade de escolha.
-	c2.addEventListener('click', escolher, false); // Reativa a possibilidade de escolha.
+	for (var c of deck) { // reativa as possibilidades de escolhas.
+		c.addEventListener("click", escolher, false);
+	} 
 }
 
 function oferecerNovoJogo() {
