@@ -1,25 +1,36 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<title>Perguntas e Respostas</title>
-	<meta name='viewport' content='width=device-width, initial-scale=1'/>
-	<meta charset="utf-8"/>
+	<meta name='viewport' content='width=device-width, initial-scale=1' />
+	<meta charset="utf-8" />
 	<style>
 		* {
 			box-sizing: border-box;
 		}
+
 		.elemento {
-			position: absolute;
-			left: 0px;
-			top: 0px;
-			border: 5px double red;
+			position: relative;
+			border: 5px double purple;
 			background-color: white;
 			margin: 5px;
 			padding: 5px;
 		}
+
 		body {
 			background-color: #ddf;
 			text-align: center;
+		}
+
+		#elementos {
+			width: 300px;
+			margin: 0 auto;
+		}
+
+		#escolhas1,
+		#escolhas2 {
+			float: left;
 		}
 	</style>
 	<script>
@@ -50,132 +61,117 @@
 			['Santa Catarina', 'Florianópolis', 'SC'],
 			['São Paulo', 'São Paulo', 'SP'],
 			['Sergipe', 'Aracaju', 'SE'],
-			['Tocantins', 'Palmas', 'TO'],			
+			['Tocantins', 'Palmas', 'TO'],
 		]
-		var elemento;		
+		var elemento;
 		var n = 7;
 		var primeiroElemento;
 		var primeiraSelecao = true;
-		var coluna1 = 450;
-		var linha1 = 300;
-		var linha_h = 50;
-		var entre = 500;
-		var slots = new Array(n);
-		var pontos = 0;
-		
+		var pontos = 0;		
+
 		function init() {
 			var e;
 			var c;
 			var id_unico;
 			var d;
-			var x = coluna1;
-			var y = linha1;
 			var s;
-			
+			var slots = new Array(n);
+			var spEscolhas1 = document.querySelector("#escolhas1");
+			var spEscolhas2 = document.querySelector("#escolhas2");
+
 			for (var i in fatos) {
 				fatos[i][3] = false;
 			}
-			
-			for (var i in slots) {
-				slots[i] = -1;
-			}
-			
+
 			for (var i = 0; i < n; i++) {
 				do {
 					e = Math.floor(Math.random() * fatos.length);
 				} while (fatos[e][3] == true);
-				
+
 				fatos[e][3] = true
-				
+
 				id_unico = 'e' + e; //'e0'
-				
-				d = document.createElement('estado');
-				d.innerHTML = '<div class="elemento" id="' + id_unico + '"></div>';
-				document.body.appendChild(d);
-				
-				elemento = document.getElementById(id_unico);
-				
-				elemento.style.left = String(x) + 'px';
-				elemento.style.top = String(y) + 'px';
-				elemento.textContent = fatos[e][0];
-				elemento.addEventListener('click', selecionar, false);
-				
+
+				d = document.createElement('div');
+				d.className = "elemento";
+				d.id = id_unico;
+				d.textContent = fatos[e][0];
+				d.addEventListener('click', selecionar, false);
+				spEscolhas1.appendChild(d);
+
 				id_unico = 'c' + e; // 'c0'
-				
-				d = document.createElement('capital');
-				d.innerHTML = '<div class="elemento" id="' + id_unico + '"></div>';
-				document.body.appendChild(d);
-				
-				elemento = document.getElementById(id_unico);
-				
+
+				d = document.createElement('div');
+				d.className = "elemento";
+				d.id = id_unico;
+				d.textContent = fatos[e][1];
+				d.addEventListener('click', selecionar, false);
+
 				do {
 					s = Math.floor(Math.random() * n);
-				} while (slots[s] >=0);
-				
-				slots[s] = e;
-				
-				elemento.style.left = String(coluna1 + entre)  + 'px';
-				elemento.style.top = String(linha1 + s * linha_h) + 'px';
-				elemento.textContent = fatos[e][1];
-				elemento.addEventListener('click', selecionar, false);
-				y += linha_h;
+				} while (slots[s] != undefined);
+
+				slots[s] = d;
 			}
 
-			function selecionar() {
-				var this_x;
-				var this_xn;
-				
-				if (primeiraSelecao) {
-					primeiroElemento = this;
-					primeiroElemento.style.backgroundColor = 'pink';
-					primeiraSelecao = false;
-				} else {
-					if (this.style.left == primeiroElemento.style.left) {
-						primeiraSelecao = true;
-						primeiroElemento.style.backgroundColor = 'white';
-						this.style.backgroundColor = 'white';
-						return;
-					}
-					
-					this_x = this.style.left; // '500px'
-					this_x = this_x.substring(0, this_x.length - 2); // '500'
-					this_xn = Number(this_x); // 500
-					
-					primeiroElemento.style.left = String(this_xn + 250) + 'px';
-					primeiroElemento.style.top = this.style.top;
-					
+			for (var i in slots) {
+				spEscolhas2.appendChild(slots[i]);
+			}
+		}
+
+		function selecionar() {
+			if (primeiraSelecao) {
+				primeiroElemento = this;
+				primeiroElemento.style.backgroundColor = 'pink';
+				primeiraSelecao = false;
+			} else {
+				if (this.parentElement == primeiroElemento.parentElement) {
 					primeiraSelecao = true;
-					
-					// 'c27' --> '27', 'e27' --> '27'
-					if (this.id.substring(1) == primeiroElemento.id.substring(1)) {
-						this.style.backgroundColor = 'green';
-						primeiroElemento.style.backgroundColor = 'green';
-						
-						document.getElementById('acao').innerHTML = 'acertou';
-						document.getElementById('pontos').innerHTML = ++pontos; 
-						
-						this.removeEventListener('click', selecionar, false);
-						primeiroElemento.removeEventListener('click', selecionar, false);
-					} else {						
-						document.getElementById('acao').innerHTML = 'errou';
-						primeiroElemento.style.backgroundColor = 'white';
-						this.removeEventListener('click', selecionar, false);
-						primeiroElemento.removeEventListener('click', selecionar, false);
-					}
+					primeiroElemento.style.backgroundColor = 'white';
+					this.style.backgroundColor = 'white';
+					return;
+				}
+
+				primeiraSelecao = true;
+
+				// 'c27' --> '27', 'e27' --> '27'
+				if (this.id.substring(1) == primeiroElemento.id.substring(1)) {
+					this.style.backgroundColor = 'green';
+					primeiroElemento.style.backgroundColor = 'green';
+
+					document.getElementById('acao').innerHTML = 'acertou';
+					document.getElementById('pontos').innerHTML = ++pontos;
+
+					this.removeEventListener('click', selecionar, false);
+					primeiroElemento.removeEventListener('click', selecionar, false);
+				} else {
+					this.style.backgroundColor = 'red';
+					primeiroElemento.style.backgroundColor = 'red';
+
+					document.getElementById('acao').innerHTML = 'errou';
+
+					this.removeEventListener('click', selecionar, false);
+					primeiroElemento.removeEventListener('click', selecionar, false);
 				}
 			}
 		}
 	</script>
 </head>
+
 <body onload='init();'>
 	<h1>Estados do Brasil</h1>
 	Clique sobre um estado ou uma capital e então clique sobre a correspondente capital ou estado.
-	<p> Reinicie para um novo jogo.
+	<p> Reinicie para um novo jogo.</p>
 	<div>
 		Ação: <span id='acao'></span>
-		<br/>
-		Pontos: <span id='pontos'>0</span>		
+		<br />
+		Pontos: <span id='pontos'>0</span>
 	</div>
-	</p>
+	<br>
+	<div id="elementos">
+		<span id="escolhas1"></span>
+		<span id="escolhas2"></span>
+	</div>
 </body>
+
 </html>
