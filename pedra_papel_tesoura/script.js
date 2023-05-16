@@ -114,11 +114,11 @@ function escolher(e) {
 	var elt;
 	
 	if (e.layerX || e.layerX ==  0) {
-		mx = e.layerX;
-		my = e.layerY;
+		mx = e.layerX - canvas.offsetLeft;
+		my = e.layerY - canvas.offsetTop;
 	} else if (e.offsetX || e.offsetX ==  0) {
-		mx = e.offsetX;
-		my = e.offsetY;
+		mx = e.offsetX - canvas.offsetLeft;
+		my = e.offsetY - canvas.offsetTop;
 	}
 	
 	for (var i in tudo) {
