@@ -1,0 +1,26 @@
+* {
+    box-sizing: border-box;
+}
+
+.elemento {
+    position: relative;
+    border: 5px double purple;
+    background-color: white;
+    margin: 5px;
+    padding: 5px;
+}
+
+body {
+    background-color: #ddf;
+    text-align: center;
+}
+
+#elementos {
+    width: 300px;
+    margin: 0 auto;
+}
+
+#escolhas1,
+#escolhas2 {
+    float: left;
+}
