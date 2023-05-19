@@ -3,24 +3,26 @@
 <head>
 	<title>Colisões Unidimensionais</title>
 	<meta charset='utf-8'/>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script>
 		var canvas; // canvas
 		var ctx; // contexto 2d
-		const PPM = 1 // Relação pixel por metros (44px/cm).
-		var x_a = 100; // posição inicial do corpo A
-		var x_b = 750; // posição inicial do corpo B
+		const FATOR_RAIO = 10 / 10 // 10kg = raio 10px
+		const FATOR_VEL = 20 / 4 // 20m/s = 4px/s
+		var x_a; // posição inicial do corpo A
+		var x_b; // posição inicial do corpo B
 		var e; // coeficiente de restituição
 		var v1_final; // velocidade final da preta
 		var v2_final; // velocidade final da branca
 		var coproA; // objeto Corpo
 		var corpoB; // objeto Corpo
 		var processador; // objeto Processador
-		var tudo = []; // guarda os corpos para processamento
+		var tudo = []; // guarda os corpos para processamento		
 		
 		// Classe Corpo.
 		function Corpo(x, y, cor) {			
 			this.m = 10;
-			this.r = 50;
+			this.r = 10 / FATOR_RAIO;
 			this.x = x;			
 			this.y = y;			
 			this.v = 0;
@@ -28,7 +30,7 @@
 		}
 		
 		Corpo.prototype.atualizar = function() {
-			this.x += this.v * PPM;
+			this.x += this.v;
 		}
 		
 		Corpo.prototype.desenhar = function() {
@@ -106,22 +108,23 @@
 		}
 		
 		Processador.prototype._mostrarResultados = function() {
-			var x = 600;
-			var y = 26;
-			var esp = 25;
+			var x = canvas.width / 2 - 100;
+			var y = 15;
+			var esp = 15;
 			
-			ctx.font = 'bold 20px sans-serif';
+			ctx.font = 'bold 12px sans-serif';
 			ctx.fillStyle = 'black';
-			ctx.fillText('Velocidade final (preta): ' + v1_final.toFixed(2) + 'm/s', x, y);
+			ctx.fillText('Velocidade final (preta): ' + (v1_final * FATOR_VEL).toFixed(2) + 'm/s', x, y);
 			ctx.fillStyle = 'white';
-			ctx.fillText('Velocidade final (branca): ' + v2_final.toFixed(2) + 'm/s', x, y + esp);
+			ctx.fillText('Velocidade final (branca): ' + (v2_final * FATOR_VEL).toFixed(2) + 'm/s', x, y + esp);
 		}
 		
 		function main() {
 			canvas = document.getElementById('canvas');
 			ctx = canvas.getContext('2d');
-			
-			var y = canvas.height / 2 - 30;
+			x_a = 20 / FATOR_RAIO;
+			x_b = canvas.width - 20 / FATOR_RAIO;
+			var y = canvas.height / 2;
 			corpoA = new Corpo(x_a, y, 'black');
 			corpoB = new Corpo(x_b, y, 'white');
 			
@@ -144,61 +147,67 @@
 			
 			corpoA.x = x_a;
 			corpoA.m = Number(f.m1.value);
-			corpoA.v = Number(f.v1.value);
-			corpoA.r = 5 * corpoA.m;
+			corpoA.v = Number(f.v1.value) / FATOR_VEL;
+			corpoA.r = corpoA.m / FATOR_RAIO;
 			
 			corpoB.x = x_b;
 			corpoB.m = Number(f.m2.value);
-			corpoB.v = Number(f.v2.value);
-			corpoB.r = 5 * corpoB.m;
+			corpoB.v = Number(f.v2.value) / FATOR_VEL;
+			corpoB.r = corpoB.m / FATOR_RAIO;
 			
 			processador.desenhar();
 		}
 	</script>
 	<style>
+		body {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
 		canvas {
 			background: green;
-			position: absolute;
-			left: 0%;
 			width: 100%;
-			height: 100%;
+			border: solid 2px black;
+    		border-radius: 20px;			
 		}
 		form {
-			position: absolute;
-			left: 37%;
-			top: 75%;
-			width: 25%;
-			height: 20%;
-			margin:20px;
-			background: brown;
+			background: #9E9D24;
 			padding: 20px;
-			display: inline-table;
+			width: fit-content;
+			margin: 0 auto;
+			border: solid 2px black;
+    		border-radius: 20px;
 		}
 		input:valid {background: green;}
 		input:invalid {background: red;}
+		input[type="submit"],
+		input[type="button"] {
+			margin: 5px 5px 0px;
+		}
 	</style>
 </head>
 <body onLoad='main();'>
-	<h1>Simulador de Colisões Unidimensionais</h1>
-	<canvas id='canvas' width='1500' height='700'></canvas>
-	<br/>
-	<form name='f' onSubmit='return iniciar();'>
-		Massa (preta): <input name='m1' type='number' value='10' min='1' max='20' onchange='configurarValore();'/>kg
-		<br/>
-		Velocidade inicial (preta): <input name='v1' type='number' value='5' min='1' max='20'/>m/s
-		<br/>
-		Massa (<font style='color: white'>branca</font>): <input name='m2' type='number' value='10' min='1' max='20' onchange='configurarValore();'/>kg
-		<br/>
-		Velocidade inicial (<font style='color: white'>branca</font>): <input name='v2' type='number' value='-5' min='-20' max='20'/>m/s
-		<br/>
-		Coeficiente de restituição: 
-		<br/> 
-		0 (inelástica) &leq; 
-		<input name='e' type='number' value='1' min='0' max='1' step='0.1'/>
-		&leq; 1 (elástica) 
-		<br/>
-		<input type='submit' name='botIniciar' value='Iniciar'/>
-		<input type='button' value='Repetir' onclick='configurarValore();'/>
-	</form>	
+	<div id="tudo">
+		<h1>Simulador de Colisões Unidimensionais</h1>
+		<canvas id='canvas'></canvas>
+		<form name='f' onSubmit='return iniciar();'>
+			Massa (preta): <input name='m1' type='number' value='10' min='1' max='20' onchange='configurarValore();'/>kg
+			<br/>
+			Velocidade inicial (preta): <input name='v1' type='number' value='5' min='1' max='20'/>m/s
+			<br/>
+			Massa (<font style='color: white'>branca</font>): <input name='m2' type='number' value='10' min='1' max='20' onchange='configurarValore();'/>kg
+			<br/>
+			Velocidade inicial (<font style='color: white'>branca</font>): <input name='v2' type='number' value='-5' min='-20' max='20'/>m/s
+			<br/>
+			Coeficiente de restituição: 
+			<br/> 
+			0 (inelástica) &leq; 
+			<input name='e' type='number' value='1' min='0' max='1' step='0.1'/>
+			&leq; 1 (elástica) 
+			<br/>
+			<input type='submit' name='botIniciar' value='Iniciar'/>
+			<input type='button' value='Repetir' onclick='configurarValore();'/>
+		</form>	
+	</div>	
 </body>
 </html>
