@@ -31,8 +31,15 @@ input:invalid {
 input[type="submit"],
 input[type="button"] {
     margin: 5px 5px 0px;
-    background-color: #03a9f4;
-    font-size: 24px;
+    font-weight: bold;
     padding: 5px;
     border-radius: 8px;
+}
+
+#botPlayPause {
+    background-color: #03a9f4;
+}
+
+#botParar {
+    background-color: #F44336;
 }
