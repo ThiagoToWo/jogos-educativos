@@ -5,228 +5,34 @@
 	<title>Colisões Unidimensionais</title>
 	<meta charset='utf-8' />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<script>
-		var canvas; // canvas
-		var ctx; // contexto 2d
-		const FATOR_RAIO = 10 / 10 // 10kg = raio 10px
-		const FATOR_VEL = 20 / 4 // 20m/s = 4px/s
-		var x_a; // posição inicial do corpo A
-		var x_b; // posição inicial do corpo B
-		var e; // coeficiente de restituição
-		var v1_final; // velocidade final da preta
-		var v2_final; // velocidade final da branca
-		var coproA; // objeto Corpo
-		var corpoB; // objeto Corpo
-		var processador; // objeto Processador
-		var tudo = []; // guarda os corpos para processamento		
-
-		// Classe Corpo.
-		class Corpo {
-			constructor(x, y, cor) {
-				this.m = 10;
-				this.r = 10 / FATOR_RAIO;
-				this.x = x;
-				this.y = y;
-				this.v = 0;
-				this.cor = cor;
-			}
-
-			atualizar() {
-				this.x += this.v;
-			}
-
-			desenhar() {
-				ctx.save();
-				ctx.beginPath();
-				ctx.fillStyle = this.cor;
-				ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
-				ctx.fill();
-				ctx.restore();
-			}
-
-			colidiuCom(outro) {
-				var x = this.x - this.r;
-				var w = 2 * this.r;
-				var ox = outro.x - outro.r;
-				var ow = 2 * outro.r;
-				return (x + w >= ox) &&
-					(x <= ox + ow);
-			}
-		}
-
-		// Classe Processador.
-		class Processador {
-			constructor() {
-				this.elementos = [];
-				this.colidiu = false;
-			}
-
-			adicionar(elemento) {
-				this.elementos.push(elemento);
-			}
-
-			ligar() {
-				this._processar();
-			}
-
-			atualizarElementos() {
-				for (var i in this.elementos) {
-					this.elementos[i].atualizar();
-				}
-			}
-
-			desenharElementos() {
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-				for (var i in this.elementos) {
-					this.elementos[i].desenhar();
-				}
-
-				if (this.colidiu == true) this._mostrarResultados();
-			}
-
-			verificarColisao() {
-				var a = this.elementos[0];
-				var b = this.elementos[1];
-
-				if (a.colidiuCom(b)) {
-					var q_total = a.m * a.v + b.m * b.v;
-					var v_afast = -e * (a.v - b.v);
-					var m_total = a.m + b.m;
-
-					v1_final = (q_total + b.m * v_afast) / m_total;
-					v2_final = v1_final - v_afast;
-
-					a.v = v1_final;
-					b.v = v2_final;
-					this.colidiu = true;
-				}
-			}
-
-			_processar() {
-				this.atualizarElementos();
-				this.desenharElementos()
-				this.verificarColisao();
-				var p = this;
-				this.raf = requestAnimationFrame(function () { p._processar(); });
-			}
-
-			_mostrarResultados() {
-				var x = canvas.width / 2 - 100;
-				var y = 15;
-				var esp = 15;
-
-				ctx.font = 'bold 12px sans-serif';
-				ctx.fillStyle = 'black';
-				ctx.fillText('Velocidade final (preta): ' + (v1_final * FATOR_VEL).toFixed(2) + 'm/s', x, y);
-				ctx.fillStyle = 'white';
-				ctx.fillText('Velocidade final (branca): ' + (v2_final * FATOR_VEL).toFixed(2) + 'm/s', x, y + esp);
-			}
-		}
-
-		function main() {
-			canvas = document.getElementById('canvas');
-			ctx = canvas.getContext('2d');
-			x_a = 20 / FATOR_RAIO;
-			x_b = canvas.width / 2;
-			var y = canvas.height / 2;
-			corpoA = new Corpo(x_a, y, 'black');
-			corpoB = new Corpo(x_b, y, 'white');
-
-			processador = new Processador();
-			processador.adicionar(corpoA);
-			processador.adicionar(corpoB);
-
-			processador.desenharElementos();
-		}
-
-		function iniciar() {
-			configurarValores();
-			processador.ligar();
-			f.botIniciar.disabled = true;
-			return false;
-		}
-
-		function configurarValores() {
-			e = Number(f.e.value);
-
-			corpoA.x = x_a;
-			corpoA.m = Number(f.m1.value);
-			corpoA.v = Number(f.v1.value) / FATOR_VEL;
-			corpoA.r = corpoA.m / FATOR_RAIO;
-
-			corpoB.x = x_b;
-			corpoB.m = Number(f.m2.value);
-			corpoB.v = Number(f.v2.value) / FATOR_VEL;
-			corpoB.r = corpoB.m / FATOR_RAIO;
-
-			processador.desenharElementos();
-		}
-	</script>
-	<style>
-		body {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-
-		canvas {
-			background: green;
-			width: 100%;
-			border: solid 2px black;
-			border-radius: 20px;
-		}
-
-		form {
-			background: #9E9D24;
-			padding: 20px;
-			width: fit-content;
-			margin: 0 auto;
-			border: solid 2px black;
-			border-radius: 20px;
-		}
-
-		input:valid {
-			background: green;
-		}
-
-		input:invalid {
-			background: red;
-		}
-
-		input[type="submit"],
-		input[type="button"] {
-			margin: 5px 5px 0px;
-		}
-	</style>
+	<link rel="stylesheet" href="style.css">
 </head>
 
-<body onLoad='main();'>
+<body>
 	<div id="tudo">
 		<h1>Simulador de Colisões Unidimensionais</h1>
 		<canvas id='canvas'></canvas>
-		<form name='f' onSubmit='return iniciar();'>
-			Massa (preta): <input name='m1' type='number' value='10' min='1' max='20'
-				onchange='configurarValores();' />kg
+		<form>
+			Massa (preta): <input id='m1' type='number' value='10' min='1' max='20'/>kg
 			<br />
-			Velocidade inicial (preta): <input name='v1' type='number' value='5' min='1' max='20' />m/s
+			Velocidade inicial (preta): <input id='v1' type='number' value='5' min='1' max='20' />m/s
 			<br />
-			Massa (<font style='color: white'>branca</font>): <input name='m2' type='number' value='10' min='1' max='20'
-				onchange='configurarValores();' />kg
+			Massa (<font style='color: white'>branca</font>): <input id='m2' type='number' value='10' min='1' max='20'/>kg
 			<br />
-			Velocidade inicial (<font style='color: white'>branca</font>): <input name='v2' type='number' value='-5'
-				min='-20' max='20' />m/s
+			Velocidade inicial (<font style='color: white'>branca</font>): <input id='v2' type='number' value='-5' min='-20' max='20'/>m/s
 			<br />
 			Coeficiente de restituição:
 			<br />
 			0 (inelástica) &leq;
-			<input name='e' type='number' value='1' min='0' max='1' step='0.1' />
+			<input id='e' type='number' value='1' min='0' max='1' step='0.1' />
 			&leq; 1 (elástica)
 			<br />
-			<input type='submit' name='botIniciar' value='Iniciar' />
-			<input type='button' value='Repetir' onclick='configurarValores();' />
+			<input type='button' id='botPlayPause' value=&#9199;>
+			<input type='button' id="botParar" value=&#9209;>
 		</form>
 	</div>
+	<script src="classes.js"></script>
+	<script src="script.js"></script>
 </body>
 
 </html>
