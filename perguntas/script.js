@@ -42,6 +42,9 @@ function init() {
     var slots = new Array(n);
     var spEscolhas1 = document.querySelector("#escolhas1");
     var spEscolhas2 = document.querySelector("#escolhas2");
+    document.querySelector("#btReiniciar").onclick = function() {
+        window.location.reload();
+    }
 
     for (var i in fatos) {
         fatos[i][3] = false;
