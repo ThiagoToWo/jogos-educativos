@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Função Quadrática</title>
+
+	<style>
+		body {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		h1 {
+			border-bottom: outset;
+		}
+
+		pre {
+			font-size: 1.2em;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="container">
+		<h1>Função Quadrática</h1>
+
+		<form>
+			<p>
+				a = <input type="number" id="a" step="0.1" autofocus required>
+			</p>
+			<p>
+				b = <input type="number" id="b" step="0.1" required>
+			</p>
+			<p>
+				c = <input type="number" id="c" step="0.1" required>
+			</p>
+			<input type="submit" value="Calcular Raiz">
+		</form>
+
+		<pre></pre>
+	</div>
+
+	<script>
+		const form = document.querySelector("form");
+		const result = document.querySelector("pre");
+
+		form.addEventListener("submit", (e) => {
+			e.preventDefault();
+
+			const a = Number(form.a.value);
+			const b = Number(form.b.value);
+			const c = Number(form.c.value);
+			let calculos = "";
+			const barraLonga = "&mdash;".repeat(15);
+			const barraCurta = "&mdash;".repeat(7);
+
+			calculos += `ax² + bx + c = 0<br>`;
+			calculos += `${a}x² ${b < 0 ? "-" : "+"} ${Math.abs(b)}x ${c < 0 ? "-" : "+"} ${Math.abs(c)} = 0<br><br>`;
+			calculos += `a = ${a}<br>`;
+			calculos += `b = ${b}<br>`;
+			calculos += `c = ${c}<br><br>`;
+
+			const d = b * b - 4 * a * c;
+			calculos += `&#916; = b² - 4 . a . c<br>`;
+			calculos += `&#916; = (${b})² - 4 . (${a}) . (${c})<br>`;
+			calculos += `&#916; = ${b * b} - (${4 * a * c})<br>`;
+			calculos += `&#916; = ${d}<br><br>`;
+
+			if (d < 0) {
+				calculos += "Não existe solução real";
+			} else if (d == 0) {
+				const x = -b / (2 * a);
+
+				calculos += `    -b &plusmn; &radic;&#916;<br>`;
+				calculos += `x = ${'&mdash;'.repeat(8)}<br>`;
+				calculos += `     2 . a<br><br>`;
+
+				calculos += `      -(${b}) &plusmn; &radic;${d}<br>`;
+				calculos += `x = ${barraLonga}<br>`;
+				calculos += `        2 . (${a})<br><br>`;
+				calculos += `      -(${b}) &plusmn; ${Math.sqrt(d)}<br>`;
+				calculos += `x = ${barraLonga}<br>`;
+				calculos += `           ${2 * a}<br><br>`;
+
+				calculos += "<hr>";
+
+				
+				calculos += `             ${-b + Math.sqrt(d)}<br>`;
+				calculos += `x' = x" = ${barraCurta}<br>`;
+				calculos += `             ${2 * a}<br><br>`;
+				calculos += `x' = x" = ${x}<br><br>`;
+			} else {
+				const x1 = (-b + Math.sqrt(d)) / (2 * a);
+				const x2 = (-b - Math.sqrt(d)) / (2 * a);
+
+				calculos += `    -b &plusmn; &radic;&#916;<br>`;
+				calculos += `x = ${'&mdash;'.repeat(8)}<br>`;
+				calculos += `     2 . a<br><br>`;
+
+				calculos += `      -(${b}) &plusmn; &radic;${d}<br>`;
+				calculos += `x = ${barraLonga}<br>`;
+				calculos += `        2 . (${a})<br><br>`;
+				calculos += `      -(${b}) &plusmn; ${Math.sqrt(d)}<br>`;
+				calculos += `x = ${barraLonga}<br>`;
+				calculos += `           ${2 * a}<br><br>`;
+
+				calculos += "<hr>";
+
+				calculos += `       -(${b}) + ${Math.sqrt(d)}<br>`;
+				calculos += `x' = ${barraLonga}<br>`;
+				calculos += `            ${2 * a}<br><br>`;
+				calculos += `        ${-b + Math.sqrt(d)}<br>`;
+				calculos += `x' = ${barraCurta}<br>`;
+				calculos += `        ${2 * a}<br><br>`;
+				calculos += `x' = ${x1}<br><br>`;
+
+				calculos += "<hr>";
+
+				calculos += `       -(${b}) - ${Math.sqrt(d)}<br>`;
+				calculos += `x" = ${barraLonga}<br>`;
+				calculos += `            ${2 * a}<br><br>`;
+				calculos += `        ${-b - Math.sqrt(d)}<br>`;
+				calculos += `x" = ${barraCurta}<br>`;
+				calculos += `        ${2 * a}<br><br>`;
+				calculos += `x" = ${x2}<br><br>`;
+			}
+
+			result.innerHTML = calculos;
+
+			form.reset();
+			form.a.focus();
+		});
+	</script>
+</body>
+
+</html>
