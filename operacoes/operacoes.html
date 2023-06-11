@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operações com Inteiros</title>
+
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: monospace;
+        }
+
+        h1 {
+            border-bottom: inset;
+        }
+
+        .inline {
+            display: inline;
+        }
+
+        button {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <h1>Operações com inteiros</h1>
+        <p>
+            Resolva operações básicas envolvendo números inteiros.
+        </p>
+
+        <div id="botoes">
+            <button id="btRegras">Ver regras de sinais</button>
+            <button id="btReiniciar">Reiniciar acertos/erros</button>
+        </div>
+
+        <dialog>
+            <h2>Regras de sinais:</h2>
+
+            <ol>
+                <li>
+                    <h3>Soma (+) ou subtração (-)</h3>
+                    <ol style="list-style-type:lower-alpha">
+                        <li><b>Sinais iguais:</b> soma e repete o sinal.</li>
+                        <li><b>Sinais diferentes:</b> subtrai e dá o sinal do maior <small>(módulo)</small>.</li>
+                    </ol>
+                </li>
+                <li>
+                    <h3>Multiplicação (×) ou divisão (/)</h3>
+                    <ol style="list-style-type:lower-alpha">
+                        <li><b>Sinais iguais:</b> efetua a operação e dá o sinal de <b>+</b>.</li>
+                        <li><b>Sinais diferentes:</b> efetua a operação e dá o sinal de <b>-</b>.</li>
+                    </ol>
+                </li>
+            </ol>
+            <button id="btFechar">Fechar</button>
+        </dialog>
+
+        <form>
+            <h3 class="inline" id="a"></h3>
+            <h3 class="inline" id="sinal"></h3>
+            <h3 class="inline" id="b"></h3> =
+            <input type="number" id="resposta" min="-81" max="81" autofocus required></input>
+            <input type="submit" value="Corrigir">
+        </form>
+
+        <div id="pontos">
+            <h3 id="acertos">Acertos: </h3>
+            <h3 id="erros">Erros: </h3>
+            <h4 id="mostraErros"></h4>
+        </div>
+
+        <script>
+            const form = document.querySelector("form");
+            const spA = document.querySelector("#a");
+            const spB = document.querySelector("#b");
+            const spSinal = document.querySelector("#sinal");
+            const outAcertos = document.querySelector("#acertos");
+            const outErros = document.querySelector("#erros");
+            const mostraErros = document.querySelector("#mostraErros");
+            const dlRegras = document.querySelector("dialog");
+            const btRegras = document.querySelector("#btRegras");
+            const btFechar = document.querySelector("#btFechar")
+            const btReiniciar = document.querySelector("#btReiniciar");
+
+            const sinais = ["+", "-", "×", "/"];
+            let a;
+            let sinal;
+            let b;
+            let acertos = 0;
+            let erros = 0;
+
+            atualizarValores();
+            configurarPontos();
+
+            form.addEventListener("submit", (e) => {
+                e.preventDefault();
+
+                let correto;
+
+                switch (sinal) {
+                    case sinais[0]: "+"
+                        correto = a + b;
+                        break;
+                    case sinais[1]: "-"
+                        correto = a - b;
+                        break;
+                    case sinais[2]: "*"
+                        correto = a * b;
+                        break;
+                    case sinais[3]: "/"
+                        correto = a / b;
+                        break;
+                }
+
+                if (form.resposta.value == correto) {
+                    acertos++;
+                } else {
+                    erros++;
+                    mostraErros.innerText += `\t${spA.innerText} ${spSinal.innerText} ${spB.innerText} = ${form.resposta.value}.`;
+                    mostraErros.innerText += ` O correto é ${correto}`;
+
+                    switch (sinal) {
+                        case sinais[0]: "+"
+                            if (a < 0 && b != 0) {
+                                if (Math.abs(a) > b) {
+                                    mostraErros.innerText += ` (regra 1.b: neste caso deve-se dar o sinal de ${Math.abs(a)} que é "-").\n\n`;
+                                } else if (Math.abs(a) < b) {
+                                    mostraErros.innerText += ` (regra 1.b: neste caso deve-se dar o sinal de ${b} que é "+").\n\n`;
+                                } else {
+                                    mostraErros.innerText += ` (regra 1.b).\n\n`;
+                                }
+                            } else if (a > 0 && b != 0) {
+                                mostraErros.innerText += ` (regra 1.a).\n\n`;
+                            } else {
+                                mostraErros.innerText += `\n\n`;
+                            }
+                            break;
+                        case sinais[1]: "-"
+                            if (a < 0 && b != 0) {
+                                mostraErros.innerText += ` (regra 1.a).\n\n`;
+                            } else if (a > 0 && b != 0) {
+                                if (Math.abs(a) > b) {
+                                    mostraErros.innerText += ` (regra 1.b: neste caso deve-se dar o sinal de ${a} que é "+").\n\n`;
+                                } else if (Math.abs(a) < b) {
+                                    mostraErros.innerText += ` (regra 1.b: neste caso deve-se dar o sinal de ${b} que é "-").\n\n`;
+                                } else {
+                                    mostraErros.innerText += ` (regra 1.b).\n\n`;
+                                }
+                            } else {
+                                mostraErros.innerText += `\n\n`;
+                            }
+                            break;
+                        case sinais[2]: "*"
+                        case sinais[3]: "/"
+                            if (a * b > 0) {
+                                mostraErros.innerText += ` (regra 2.a).\n\n`;
+                            } else if (a * b < 0) {
+                                mostraErros.innerText += ` (regra 2.b).\n\n`;
+                            } else {
+                                mostraErros.innerText += `\n\n`;
+                            }
+                            break;
+                    }                                        
+                }
+
+                configurarPontos();
+                form.resposta.value = "";
+                atualizarValores();
+            });
+
+            btRegras.addEventListener("click", () => {
+                dlRegras.showModal();
+            });
+
+            btFechar.addEventListener("click", () => {
+                dlRegras.close();
+            });
+
+            btReiniciar.addEventListener("click", () => {
+                window.location.reload();
+            });
+
+            function atualizarValores() {
+                sinal = sinais[Math.floor(Math.random() * 4)];
+
+                switch (sinal) {
+                    case sinais[0]:
+                    case sinais[1]:
+                        a = Math.floor(-9 + Math.random() * 19);
+                        b = Math.floor(Math.random() * 10);
+                        spA.innerText = a;
+                        spSinal.innerText = sinal;
+                        spB.innerText = b;
+                        break;
+                    case sinais[2]:
+                        a = Math.floor(-9 + Math.random() * 19);
+                        b = Math.floor(-9 + Math.random() * 19);
+
+                        if (b < 0) {
+                            spB.innerText = "(" + b + ")";
+                        } else {
+                            spB.innerText = b;
+                        }
+
+                        spA.innerText = a;
+                        spSinal.innerText = sinal;
+                        break;
+                    case sinais[3]:
+                        const fator = Math.floor(-9 + Math.random() * 19);
+
+                        do {
+                            b = Math.floor(-9 + Math.random() * 19);
+                        } while (b == 0);
+
+                        a = b * fator;
+
+                        if (b < 0) {
+                            spB.innerText = "(" + b + ")";
+                        } else {
+                            spB.innerText = b;
+                        }
+
+                        spA.innerText = a;
+                        spSinal.innerText = sinal;
+                        break;
+                }
+            }
+
+            function configurarPontos() {
+                outAcertos.innerText = "Acertos: " + acertos;
+                outErros.innerText = "Erros: " + erros;
+            }
+        </script>
+    </div>
+</body>
+
+</html>
