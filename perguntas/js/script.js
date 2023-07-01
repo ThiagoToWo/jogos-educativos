@@ -1,68 +1,37 @@
-var fatos = [
-    ['Acre', 'Rio Branco', 'AC'],
-    ['Alagoas', 'Maceió', 'AL'],
-    ['Amapá', 'Macapá', 'AP'],
-    ['Amazonas', 'Manaus', 'AM'],
-    ['Bahia', 'Salvador', 'BA'],
-    ['Ceará', 'Fortaleza', 'CE'],
-    ['Distrito Federal', 'Brasília', 'DF'],
-    ['Espírito Santo', 'Vitória', 'ES'],
-    ['Goiás', 'Goiânia', 'GO'],
-    ['Maranhão', 'São Luís', 'MA'],
-    ['Mato Grosso', 'Cuiabá', 'MT'],
-    ['Mato Grosso do Sul', 'Campo Grande', 'MS'],
-    ['Minas Gerais', 'Belo Horizonte', 'MG'],
-    ['Pará', 'Belém', 'PA'],
-    ['Paraíba', 'João Pessoa', 'PB'],
-    ['Paraná', 'Curitiba', 'PR'],
-    ['Pernambuco', 'Recife', 'PE'],
-    ['Piauí', 'Teresina', 'PI'],
-    ['Rio de Janeiro', 'Rio de Janeiro', 'RJ'],
-    ['Rio Grande do Norte', 'Natal', 'RN'],
-    ['Rio Grande do Sul', 'Porto Alegre', 'RS'],
-    ['Rondônia', 'Porto Velho', 'RO'],
-    ['Roraima', 'Boa Vista', 'RR'],
-    ['Santa Catarina', 'Florianópolis', 'SC'],
-    ['São Paulo', 'São Paulo', 'SP'],
-    ['Sergipe', 'Aracaju', 'SE'],
-    ['Tocantins', 'Palmas', 'TO'],
-]
 var elemento;
 var n = 7;
 var primeiroElemento;
 var primeiraSelecao = true;
-var pontos = 0;		
+var pontos = 0;
+
+window.onload = init;
 
 function init() {
     var e;
-    var c;
     var id_unico;
     var d;
     var s;
     var slots = new Array(n);
     var spEscolhas1 = document.querySelector("#escolhas1");
     var spEscolhas2 = document.querySelector("#escolhas2");
-    document.querySelector("#btReiniciar").onclick = function() {
-        window.location.reload();
-    }
 
-    for (var i in fatos) {
-        fatos[i][3] = false;
+    document.querySelector("#btReiniciar").onclick = function () {
+        window.location.reload();
     }
 
     for (var i = 0; i < n; i++) {
         do {
             e = Math.floor(Math.random() * fatos.length);
-        } while (fatos[e][3] == true);
+        } while (fatos[e][0] == true);
 
-        fatos[e][3] = true
+        fatos[e][0] = true
 
         id_unico = 'e' + e; //'e0'
 
         d = document.createElement('div');
         d.className = "elemento";
         d.id = id_unico;
-        d.textContent = fatos[e][0];
+        d.textContent = fatos[e][1];
         d.addEventListener('click', selecionar, false);
         spEscolhas1.appendChild(d);
 
@@ -71,7 +40,7 @@ function init() {
         d = document.createElement('div');
         d.className = "elemento";
         d.id = id_unico;
-        d.textContent = fatos[e][1];
+        d.textContent = fatos[e][Math.floor(2 + Math.random() * (fatos[e].length - 2))];
         d.addEventListener('click', selecionar, false);
 
         do {

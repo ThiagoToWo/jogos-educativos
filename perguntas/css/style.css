@@ -2,16 +2,18 @@
     box-sizing: border-box;
 }
 
+a {
+    display: block;
+    line-height: 25px;
+}
+
 .elemento {
     position: relative;
-    border: 5px double purple;
-    background-color: white;
     margin: 5px;
     padding: 5px;
 }
 
 body {
-    background-color: #ddf;
     text-align: center;
 }
 

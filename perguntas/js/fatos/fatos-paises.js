@@ -1,0 +1,9 @@
+var fatos = [
+    [false, 'América do Norte', 'Canadá', 'Estados Unidos', 'Mexico'],
+    [false, 'América Central', 'Guatemala', 'Belize', 'Honduras', 'Jamaica', 'Panamá', 'Cuba', 'Costa Rica', 'Nicarágua', 'El Salvador', 'Haiti', 'República Dominicana'],
+    [false, 'América do Sul', 'Brasil', 'Guiana Francesa', 'Venezuela', 'Argentina', 'Chile', 'Suriname', 'Colômbia', 'Peru', 'Equador', 'Bolívia', 'Guiana', 'Uruguai', 'Paraguai'],
+    [false, 'Europa', 'Portugal', 'Noruega', 'Finlândia', 'Suiça', 'França', 'Espanha', 'Alemanha', 'Itália', 'Reino Unido', 'Grécia', 'Holanda', 'Irlanda', 'Bélgica', 'Luxemburgo', 'Áustria', 'Croácia', 'Dinamarca', 'Suécia', 'Polônia', 'Estônia', 'Letônia', 'Romênia', 'Bulgária', 'Albânia', 'Ucrânia', 'Hungria', 'Lutuânia', 'República Tcheca', 'Vaticano', 'Macedônia', 'Sérvia'],
+    [false, 'Ásia', 'Japão', 'China', 'Mongólia', 'Rússia', 'Arábia Saudita', 'Líbano', 'Turquia', 'Índia', 'Indonésia', 'Vietnã', 'Iêmem', 'Omã', 'Catar', 'Cazaquistão', 'Iraque', 'Irã', 'Kwait', 'Paquistão', 'Brunei', 'Malásia', 'Filipinas', 'Coréia do Norte', 'Coréia do Sul', 'Camboja', 'Tailândia', 'Singapura', 'Israel', 'Afeganistão', 'Nepal', 'Laos', 'Sri Lanka', 'Usbequistão', 'Síria', 'Jordânia', 'Butão'],
+    [false, 'África', 'Benin', 'Guiné Bissau', 'Angola', 'Congo', 'Serra Leoa', 'Moçambique', 'Sudão', 'Marrocos', 'Egito', 'África do Sul', 'Nigéria', 'Quênia', 'Gana', 'Senegal', 'Tanzânia', 'Uganda', 'Etiópia', 'Mali', 'Costa do Marfim', 'Argélia', 'Madagascar', 'Somália', 'Camarões', 'Tunísia', 'Zimbábue', 'Ruanda', 'Namíbia', 'Zâmbia', 'Libéria', 'Guiné', 'Chade', 'Cabo Verde', 'Burkina Faso', 'Líbia', 'Gâmbia', 'Botsuana', 'Burundi', 'Togo', 'Djibouti', 'Ilhas Maurício', 'Gabão', 'Malawi', 'Lesoto', 'Mauritânia', ],
+    [false, 'Oceania', 'Austália', 'Nova Zelândia', 'Papua - Nova Guiné', 'Fiji', 'Ilhas Marshall', 'Ilhas Salomão', 'Kiribati', 'Nauru', 'Palau', 'Samoa', 'Tonga', 'Tuvalu', 'Vanuatu']
+]
