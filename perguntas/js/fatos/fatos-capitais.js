@@ -16,7 +16,7 @@ var fatos = [
     [false, 'Paraíba', 'João Pessoa'],
     [false, 'Paraná', 'Curitiba'],
     [false, 'Pernambuco', 'Recife'],
-    [false, 'Piauí', 'Teresina', 'PI'],
+    [false, 'Piauí', 'Teresina'],
     [false, 'Rio de Janeiro', 'Rio de Janeiro'],
     [false, 'Rio Grande do Norte', 'Natal'],
     [false, 'Rio Grande do Sul', 'Porto Alegre'],
