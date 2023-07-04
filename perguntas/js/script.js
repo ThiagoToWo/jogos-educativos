@@ -43,11 +43,14 @@ function init() {
         d.textContent = fatos[e][Math.floor(2 + Math.random() * (fatos[e].length - 2))];
         d.addEventListener('click', selecionar, false);
 
-        do {
-            s = Math.floor(Math.random() * n);
-        } while (slots[s] != undefined);
+        slots[i] = d;
+    }
 
-        slots[s] = d;
+    for (let ultimo = slots.length - 1; ultimo > 0; ultimo--) {
+        const i = Math.floor(Math.random() * (ultimo - 1));
+        const temp = slots[ultimo];
+        slots[ultimo] = slots[i];
+        slots[i] = temp;
     }
 
     for (var i in slots) {
