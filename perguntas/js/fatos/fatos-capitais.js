@@ -1,4 +1,4 @@
-var fatos = [
+const fatos = [
     [false, 'Acre', 'Rio Branco'],
     [false, 'Alagoas', 'Maceió'],
     [false, 'Amapá', 'Macapá'],

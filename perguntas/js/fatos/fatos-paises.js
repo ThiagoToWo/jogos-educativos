@@ -1,4 +1,4 @@
-var fatos = [
+const fatos = [
     [false, 'América do Norte', 'Canadá', 'Estados Unidos', 'Mexico'],
     [false, 'América Central', 'Guatemala', 'Belize', 'Honduras', 'Jamaica', 'Panamá', 'Cuba', 'Costa Rica', 'Nicarágua', 'El Salvador', 'Haiti', 'República Dominicana'],
     [false, 'América do Sul', 'Brasil', 'Guiana Francesa', 'Venezuela', 'Argentina', 'Chile', 'Suriname', 'Colômbia', 'Peru', 'Equador', 'Bolívia', 'Guiana', 'Uruguai', 'Paraguai'],
