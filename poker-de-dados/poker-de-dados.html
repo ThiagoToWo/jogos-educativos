@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker de Dados</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #container {
+            width: 100%;
+            max-width: 360px;
+            border: solid 1px;
+            background-color: #ccc;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        header {
+            background-color: #fff;
+            padding: 5px 5px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        header button {
+            background-color: #aaa;
+            padding: 2px 5px;
+            margin: 0px 3px;
+        }
+
+        #dados {
+            display: grid;
+            grid-template-columns: auto auto auto auto auto;
+            height: 60px;
+            margin: 2px;
+        }
+
+        #dados div {
+            display: flex;
+            border: solid 1px;
+            justify-content: center;
+            align-items: center;
+            margin: 0px 1px;
+            font-weight: bold;
+        }
+
+        #jogadas {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        table {
+            text-align: left;
+            margin: 0px 10px;
+        }
+
+        table button,
+        span {
+            width: 60px;
+            height: 20px;
+            margin-left: 10px;
+        }
+
+        #botoes {
+            display: flex;
+            justify-content: center;
+            background-color: #fff;
+            padding: 5px 5px;
+        }
+
+        #botoes button {
+            margin: 5px;
+        }
+
+        .selecionado {
+            background-color: #666;
+        }
+
+        .livre {
+            background-color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <h1>Poker de Dados</h1>
+        <header>
+            <div id="menu">
+                <button id="novo">Novo Jogo</button>
+                <hr>
+                <label for="estilo">Estilos:</label>
+                <select id="estilo">
+                    <option value="numeros">Números</option>
+                    <option value="pontos">Pontos</option>
+                    <option value="flores">Flores</option>
+                    <option value="dados-numericos">Dados e Números</option>
+                </select>
+                <hr>
+                <label for="infos">Informações:</label>
+                <select id="infos">
+                    <option value="nulo">------</option>
+                    <option value="autor">Autor</option>
+                    <option value="versao">Versão</option>
+                    <option value="regras">Regras</option>
+                    <option value="record">Record</option>
+                </select>
+            </div>
+            <dialog id="autor"></dialog>
+            <dialog id="versao"></dialog>
+            <dialog id="regras"></dialog>
+            <dialog id="record"></dialog>
+        </header>
+        <div id="dados">
+            <div name="dado" id="dado1"></div>
+            <div name="dado" id="dado2"></div>
+            <div name="dado" id="dado3"></div>
+            <div name="dado" id="dado4"></div>
+            <div name="dado" id="dado5"></div>
+        </div>
+        <div id="jogadas">
+            <table>
+                <tr>
+                    <th>Um</th>
+                    <th><button name="jogada" id="one">0</button></th>
+                </tr>
+                <tr>
+                    <th>Dois</th>
+                    <th><button name="jogada" id="two">0</button></th>
+                </tr>
+                <tr>
+                    <th>Três</th>
+                    <th><button name="jogada" id="three">0</button></th>
+                </tr>
+                <tr>
+                    <th>Quatro</th>
+                    <th><button name="jogada" id="four">0</button></th>
+                </tr>
+                <tr>
+                    <th>Cinco</th>
+                    <th><button name="jogada" id="five">0</button></th>
+                </tr>
+                <tr>
+                    <th>Seis</th>
+                    <th><button name="jogada" id="six">0</button></th>
+                </tr>
+                <tr>
+                    <th>Trinca</th>
+                    <th><button name="jogada" id="3-kind">0</button></th>
+                </tr>
+                <tr>
+                    <th>Quadra</th>
+                    <th><button name="jogada" id="4-kind">0</button></th>
+                </tr>
+                <tr>
+                    <th>Par + Trinca</th>
+                    <th><button name="jogada" id="fhouse">0</button></th>
+                </tr>
+                <tr>
+                    <th>Sequência Menor</th>
+                    <th><button name="jogada" id="sstr">0</button></th>
+                </tr>
+                <tr>
+                    <th>Sequência Maior</th>
+                    <th><button name="jogada" id="lstr">0</button></th>
+                </tr>
+                <tr>
+                    <th>Quina</th>
+                    <th><button name="jogada" id="5-kind">0</button></th>
+                </tr>
+                <tr>
+                    <th>Reserva</th>
+                    <th><button name="jogada" id="chance">0</button></th>
+                </tr>
+                <tr>
+                    <th>Total</th>
+                    <th><span id="total"></span></th>
+                </tr>
+            </table>
+        </div>
+        <div id="botoes">
+            <button id="rolar"></button>
+            <button id="contar" disabled>Contabilizar</button>
+        </div>
+    </div>
+
+    <script>
+        const btNovoJogo = document.querySelector("#novo");
+        const slEstilo = document.querySelector("#estilo");
+        const slInfo = document.querySelector("#infos");
+        const dvDados = document.querySelectorAll("[name='dado']");
+        const btJogadas = document.querySelectorAll("[name='jogada']");
+        const btRolar = document.querySelector("#rolar");
+        const btContar = document.querySelector("#contar");
+        const spTotal = document.querySelector("#total");
+        let roladas = 3;
+        let numJogadas = 0;
+        let totalDePontos = 0;
+        const dados = ["", "", "", "", "", ""];
+        const imgDados = {
+            numeros: ["1", "2", "3", "4", "5", "6"],
+            pontos: [
+                "&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;<br>&nbsp;&nbsp; &bull; &nbsp;&nbsp;<br>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;",
+                "&bull; &nbsp;&nbsp; &nbsp;&nbsp;<br>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;<br>&nbsp;&nbsp; &nbsp;&nbsp; &bull;",
+                "&bull; &nbsp;&nbsp; &nbsp;&nbsp;<br>&nbsp;&nbsp; &bull; &nbsp;&nbsp;<br>&nbsp;&nbsp; &nbsp;&nbsp; &bull;",
+                "&bull; &nbsp;&nbsp; &bull;<br>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;<br>&bull; &nbsp;&nbsp; &bull;",
+                "&bull; &nbsp;&nbsp; &bull;<br>&nbsp;&nbsp; &bull; &nbsp;&nbsp;<br>&bull; &nbsp;&nbsp; &bull;",
+                "&bull; &nbsp;&nbsp; &bull;<br>&bull; &nbsp;&nbsp; &bull;<br>&bull; &nbsp;&nbsp; &bull;"
+            ],
+            flores: [
+                "&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;<br>&nbsp;&nbsp; &#10048; &nbsp;&nbsp;<br>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;",
+                "&#10048; &nbsp;&nbsp; &nbsp;&nbsp;<br>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;<br>&nbsp;&nbsp; &nbsp;&nbsp; &#10048;",
+                "&#10048; &nbsp;&nbsp; &nbsp;&nbsp;<br>&nbsp;&nbsp; &#10048; &nbsp;&nbsp;<br>&nbsp;&nbsp; &nbsp;&nbsp; &#10048;",
+                "&#10048; &nbsp;&nbsp; &#10048;<br>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;<br>&#10048; &nbsp;&nbsp; &#10048;",
+                "&#10048; &nbsp;&nbsp; &#10048;<br>&nbsp;&nbsp; &#10048; &nbsp;&nbsp;<br>&#10048; &nbsp;&nbsp; &#10048;",
+                "&#10048; &nbsp;&nbsp; &#10048;<br>&#10048; &nbsp;&nbsp; &#10048;<br>&#10048; &nbsp;&nbsp; &#10048;"
+            ],
+            dadosNumericos: [
+                "&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;<br>&nbsp;&nbsp; 1 &nbsp;&nbsp;<br>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;",
+                "2 &nbsp;&nbsp; &nbsp;&nbsp;<br>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;<br>&nbsp;&nbsp; &nbsp;&nbsp; 2",
+                "3 &nbsp;&nbsp; &nbsp;&nbsp;<br>&nbsp;&nbsp; 3 &nbsp;&nbsp;<br>&nbsp;&nbsp; &nbsp;&nbsp; 3",
+                "4 &nbsp;&nbsp; 4<br>&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;<br>4 &nbsp;&nbsp; 4",
+                "5 &nbsp;&nbsp; 5<br>&nbsp;&nbsp; 5 &nbsp;&nbsp;<br>5 &nbsp;&nbsp; 5",
+                "6 &nbsp;&nbsp; 6<br>6 &nbsp;&nbsp; 6<br>6 &nbsp;&nbsp; 6"
+            ]
+        }
+        const autor = "Thiago de Oliveira Alves\ntowo497@gmail.com";
+        const versao = "versão 2.0\n29/07/2023";
+        const regras = "Como Jogar\n\n" +
+            "O jogo consiste em 13 rodadas. Em cada rodada, você joga os dados e então marca uma das 13 categorias.\n" +
+            "Você tem que marcar uma categoria em cada rodada, o que significa que para o fim do jogo você pode ter" +
+            " que se conformar em marcar zero em algumas categorías. O objetivo do jogo é maximizar sua pontuação total.\n" +
+            "O jogo termina uma vez que todas as 13 categorias forem marcadas.\n\n" +
+            "Jogando os Dados\n\n" +
+            "Você tem cinco dados que pode jogar. Para começar, clique no botão \"Rolar (3)\". Depois que você\n" +
+            "joga os dados, você pode aceitar o jogo atual, ou jogar novamente qualquer um ou até todos os cinco dados.\n" +
+            "Para jogar novamente alguns dos dados, clique nos dados que desejar manter (cada dado a ser mantido ficará " +
+            "escuro) então clique no mesmo botão que utilizou para jogar os dados da primeira vez. Isto jogará os dados " +
+            "não selecionados e deixará os selcionados inalterados.\n Você pode jogar os dados um total de três vezes: " +
+            "a jogada inicial (a qual você tem que jogar todos os dados), mais duas jogadas de qualquer um ou até todos " +
+            "os dados.\n Depois de rodar três vezes ou quando achar que fez uma boa pontuaçao, você tem que marcar o jogo.\n" +
+            "Uma vez que você marcou o jogo, você joga todos os dados novamente e repete o processo.\n Você continua até " +
+            "todas as 13 categorias estarem preenchidas, quando então, termina a partida.\n\n" +
+            "Regras\n\n" +
+            "Nos botões \"Um, Dois, Três, Quatro, Cinco, e Seis\", o número de " +
+            "pontos marcado depende da quantidade de dados em sua combinação que tiver aquele valor.\n Nos \"Trinca, " +
+            "Quadra, Par + Trinca, Sequência Menor, Sequência Maior, Quina e Reserva\", o número de pontos " +
+            "marcado é fixo para alguns e variável para outros. Semelhantemente, você receberá pontos de gratificação " +
+            "em certos casos.\n Tenha cuidado para não pôr uma combinação no botão errado, porque o botão é desabilitado " +
+            "e não poderá mais ser usado.\n A meta do jogo não é só encher todas as caixas para cada combinação, mas " +
+            "também obter tantos pontos quanto possível.\n Jogando frequentemente, você perceberá que certas combinações, " +
+            "como uma Quina, não são tão fácil de serem obtidas.\n\n" +
+            "Tabela com os Valores de Pontuação\n\n" +
+            "- Um: soma de todos os valores 1.\n" +
+            "- Dois: soma de todos os valores 2.\n" +
+            "- Três: soma de todos os valores 3.\n" +
+            "- Quatro: soma de todos os valores 4.\n" +
+            "- Cinco: soma de todos os valores 5.\n" +
+            "- Seis: soma de todos os valores 6.\n" +
+            "- Bonus: se a soma das categorias acima ultrapassar 63 pontos, recebe 50 pontos a mais no final.\n" +
+            "- Trinca: no mínimo 3 iguais. Vale a soma dos dados.\n" +
+            "- Quadra: no mínimo 4 iguais. Vale a soma dos dados.\n" +
+            "- Par + Trinca: 2 iguais + 3 iguais. Vale 25 pontos.\n" +
+            "- Sequência Menor: sequência de no mínimo 4 números. Vale 30 pontos.\n" +
+            "- Sequência Maior: sequência de 5 números. Vale 40 pontos.\n" +
+            "- Quina: 5 iguais. Vale 50 pontos.\n" +
+            "- Reserva: qualquer combinação. Vale a soma dos dados.";
+
+        btNovoJogo.addEventListener("click", () => {
+            window.location.reload();
+        });
+
+        slEstilo.addEventListener("change", colocarImagensDosDados());
+
+        slInfo.addEventListener("change", () => {
+            const index = slInfo.selectedIndex;
+
+            switch (index) {
+                case 1:
+                    // mostrar dialog do autor
+                    mostarDialog("#autor", autor);
+                    break;
+                case 2:
+                    // mostrar dialog da versão
+                    mostarDialog("#versao", versao)
+                    break;
+                case 3:
+                    // mostrar dialog de regras
+                    mostarDialog("#regras", regras);
+                    break;
+                case 4:
+                    // mostrar dialog de record
+                    const record = JSON.parse(localStorage.getItem("recordyahtzee"));
+                    let infosRecord;
+
+                    if (record == undefined) {
+                        infosRecord = `0 pontos\nData:\nNome:`;
+                    } else {
+                        infosRecord = `${record.pontos} pontos\nData: ${record.data}\nNome: ${record.nome}`;
+                    }
+                    mostarDialog("#record", infosRecord);
+                    break;
+            }
+
+            slInfo.selectedIndex = 0;
+        });
+
+        deixarLivre(dvDados);
+
+        for (const jg of btJogadas) {
+            jg.addEventListener("click", selecionarUnico);
+        }
+
+        btRolar.innerText = `Rolar (${roladas})`;
+        btRolar.addEventListener("click", rolarDados);
+
+        btContar.addEventListener("click", contabilizarPontos);
+
+        // funções de comportamento dos elementos da GUI
+        function selecionarBotao() {
+            if (this.className == "livre") {
+                this.className = "selecionado";
+            } else {
+                this.className = "livre";
+            }
+        }
+
+        function selecionarUnico() {
+            this.className = "selecionado";
+
+            for (const bt of btJogadas) {
+                if (bt != this) {
+                    bt.className = "";
+                }
+            }
+        }
+
+        function deixarLivre(elementos) {
+            for (const el of elementos) {
+                el.innerHTML = "";
+                el.className = "livre";
+            }
+        }
+
+        function habilitarClique(elementos) {
+            for (const el of elementos) {
+                el.addEventListener("click", selecionarBotao);
+            }
+        }
+
+        function desabilitarClique(elementos) {
+            for (const el of elementos) {
+                el.removeEventListener("click", selecionarBotao);
+            }
+        }
+
+        function mostarDialog(seletor, texto) {
+            const dialog = document.querySelector(seletor);
+            dialog.innerText = texto;
+            dialog.innerHTML += "<br><br>";
+            const btFechar = document.createElement("button");
+            btFechar.innerHTML = "Fechar";
+            btFechar.addEventListener("click", () => {
+                dialog.close();
+            });
+            dialog.appendChild(btFechar);
+            dialog.showModal();
+        }
+
+        function mudarTamanhoDaFonte(elementos, tamanho) {
+            for (const el of elementos) {
+                if (el.style.fontSize == tamanho) break;
+                el.style.fontSize = tamanho;
+            }
+        }
+
+        // funções para a lógica do jogo
+        function rolarDados() {
+            habilitarClique(dvDados);
+
+            if (roladas > 0) {
+                btContar.disabled = false;
+
+                for (let i = 0; i < 5; i++) {
+                    if (dvDados[i].className != "selecionado") {
+                        dados[i] = Math.floor(1 + Math.random() * 6);
+                    }
+                }
+
+                colocarImagensDosDados();
+
+                roladas--;
+                btRolar.innerText = `Rolar (${roladas})`;
+            }
+
+            const resultados = contarJogadas(dados);
+
+            for (let i = 0; i < btJogadas.length; i++) {
+                if (!btJogadas[i].disabled) {
+                    btJogadas[i].innerText = resultados[i];
+                }
+            }
+
+        }
+
+        function colocarImagensDosDados() {
+            const index = slEstilo.selectedIndex;
+            let estilo;
+
+            switch (index) {
+                case 0:
+                    mudarTamanhoDaFonte(dvDados, "32px");
+                    estilo = imgDados.numeros;
+                    break;
+                case 1:
+                    mudarTamanhoDaFonte(dvDados, "16px");
+                    estilo = imgDados.pontos;
+                    break;
+                case 2:
+                    mudarTamanhoDaFonte(dvDados, "12px");
+                    estilo = imgDados.flores;
+                    break;
+                case 3:
+                    mudarTamanhoDaFonte(dvDados, "16px");
+                    estilo = imgDados.dadosNumericos;
+                    break;
+            }
+
+            for (let i = 0; i < dvDados.length; i++) {
+                dvDados[i].innerHTML = estilo[dados[i] - 1];
+            }
+        }
+
+        function contarJogadas(dados) {
+            const freq = [0, 0, 0, 0, 0, 0];
+            let tem2 = false;
+            let tem3 = false;
+            let tem4 = false;
+            let tem5 = false;
+            const jogadas = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            let soma = 0;
+
+            for (let i = 0; i < dados.length; i++) {
+                soma += dados[i];
+            }
+
+            for (let i = 0; i < dados.length; i++) {
+                if (dados[i] == 1) freq[0]++;
+                else if (dados[i] == 2) freq[1]++;
+                else if (dados[i] == 3) freq[2]++;
+                else if (dados[i] == 4) freq[3]++;
+                else if (dados[i] == 5) freq[4]++;
+                else if (dados[i] == 6) freq[5]++;
+            }
+
+            jogadas[0] = freq[0]; // soma dos 1
+            jogadas[1] = freq[1] * 2; // soma dos 2
+            jogadas[2] = freq[2] * 3; // soma dos 3
+            jogadas[3] = freq[3] * 4; // soma dos 4
+            jogadas[4] = freq[4] * 5; // soma dos 5
+            jogadas[5] = freq[5] * 6; // soma dos 6
+
+            for (let i = 0; i < freq.length; i++) {
+                if (freq[i] == 2) {
+                    tem2 = true;
+                } else if (freq[i] == 3) {
+                    tem3 = true;
+                } else if (freq[i] == 4) {
+                    tem3 = true;
+                    tem4 = true;
+                    break;
+                } else if (freq[i] == 5) {
+                    tem3 = true;
+                    tem4 = true;
+                    tem5 = true;
+                    break;
+                }
+            }
+
+            if (tem3) {
+                jogadas[6] = soma; // 3 de um tipo
+            }
+
+            if (tem4) {
+                jogadas[7] = soma; // 4 de um tipo
+            }
+
+            if (tem2 && tem3) {
+                jogadas[8] = 25 // full house
+            }
+
+            const _1 = freq[0] >= 1;
+            const _2 = freq[1] >= 1;
+            const _3 = freq[2] >= 1;
+            const _4 = freq[3] >= 1;
+            const _5 = freq[4] >= 1;
+            const _6 = freq[5] >= 1;
+
+            if (
+                _1 && _2 && _3 && _4 ||
+                _2 && _3 && _4 && _5 ||
+                _3 && _4 && _5 && _6
+            ) {
+                jogadas[9] = 30; // small straight
+            }
+
+            if (
+                _1 && _2 && _3 && _4 && _5 ||
+                _2 && _3 && _4 && _5 && _6
+            ) {
+                jogadas[10] = 40; // large straight
+            }
+
+            if (tem5) {
+                jogadas[11] = 50; // 5 de um tipo
+            }
+
+            jogadas[12] = soma; // soma dos dados em chance
+
+            return jogadas;
+        }
+
+        function contabilizarPontos() {
+            for (bt of btJogadas) {
+                if (bt.className == "selecionado") {
+                    totalDePontos += Number(bt.innerText);
+                    spTotal.innerText = totalDePontos;
+                    bt.disabled = "true";
+
+                    deixarLivre(dvDados);
+
+                    for (const bt of btJogadas) {
+                        bt.className = "";
+
+                        if (!bt.disabled) {
+                            bt.innerText = 0;
+                        }
+                    }
+
+                    roladas = 3;
+                    btRolar.innerText = `Rolar (${roladas})`;
+                    numJogadas++;
+                    btContar.disabled = true;
+                    break;
+                }
+            }
+
+            desabilitarClique(dvDados);
+
+            if (numJogadas == 13) { // jogo acabou
+                let soma = 0;
+
+                for (let i = 0; i < 6; i++) {
+                    soma += Number(btJogadas[i].innerText);
+                }
+
+                if (soma > 63) {
+                    totalDePontos += 50;
+                    spTotal.innerText = `${totalDePontos} (bônus 50)`;
+                }
+
+                btRolar.disabled = true;
+
+                salvarRecord();
+            }
+        }
+
+        function salvarRecord() {
+            let infosRecord = localStorage.getItem("recordyahtzee");
+            let record;
+            const date = new Date();
+
+            if (infosRecord == undefined) {
+                const nome = prompt(`Novo record! ${totalDePontos} pontos.\n\nDigite deu nome:`);
+                const data = `${date.getDate()}/${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
+                const pontos = totalDePontos;
+                record = { nome, data, pontos };
+                localStorage.setItem("recordyahtzee", JSON.stringify(record));
+            } else {
+                record = JSON.parse(infosRecord);
+
+                if (totalDePontos > record.pontos) {
+                    record.nome = prompt(`Novo record! ${totalDePontos} pontos.\n\nDigite deu nome:`);
+                    record.data = `${date.getDate()}/${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
+                    record.pontos = totalDePontos;
+                    localStorage.setItem("recordyahtzee", JSON.stringify(record));
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
