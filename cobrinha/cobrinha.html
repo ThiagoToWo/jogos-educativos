@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Cobrinha</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+        }
+
+        canvas {
+            background-color: #000;
+        }
+
+        #botoes {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30%;
+        }
+
+        #verticais button {
+            display: block;
+        }
+
+        button {
+            font-weight: bold;
+            width: 80px;
+            height: 80px;
+        }
+
+        span {
+            margin: 20px;
+        }
+    </style>
+
+    <script id="engine">
+        // Engine
+        let canvas;
+        let context;
+        const logs = []; // marca os pontos e mostra informações do jogo
+
+        let cobrinha;
+        let maca;
+        let record;
+
+        const CARREGANDO = 0;
+        const JOGANDO = 1;
+        const MORREU = 2;
+
+        let estadoAtual = CARREGANDO;
+
+        const W = 10;
+
+        let movendoParaEsquerda;
+        let movendoParaCima;
+        let movendoParaDireita;
+        let movendoParaBaixo;
+
+        window.addEventListener("keydown", (e) => {
+            switch (e.key) {
+                case "ArrowLeft":
+                    if (!movendoParaDireita) {
+                        movendoParaEsquerda = true;
+                    }
+
+                    movendoParaCima = false;
+                    movendoParaBaixo = false;
+                    break;
+                case "ArrowUp":
+                    if (!movendoParaBaixo) {
+                        movendoParaCima = true;
+                    }
+
+                    movendoParaEsquerda = false;
+                    movendoParaDireita = false;
+                    break;
+                case "ArrowRight":
+                    if (!movendoParaEsquerda) {
+                        movendoParaDireita = true;
+                    }
+
+                    movendoParaCima = false;
+                    movendoParaBaixo = false;
+                    break;
+                case "ArrowDown":
+                    if (!movendoParaCima) {
+                        movendoParaBaixo = true;
+                    }
+
+                    movendoParaEsquerda = false;
+                    movendoParaDireita = false;
+                    break;
+            }
+        });
+
+        function iniciarJogo() {
+            switch (estadoAtual) {
+                case CARREGANDO:
+                    carregarJogo();
+                    estadoAtual = JOGANDO;
+                    break;
+                case JOGANDO:
+                    processarJogo();
+                    break;
+                case MORREU:
+                    processarMorte();
+                    pausarPor(1500);
+                    estadoAtual = CARREGANDO;
+                    break;
+            }
+
+            renderizar();
+        }
+
+        function carregarJogo() {
+            record = localStorage.getItem("record-cobrinha") || 1;
+
+            const xc = canvas.width / 2;
+            const yc = canvas.height / 2;
+
+            cobrinha = new Cobrinha(xc, yc, W, W, context);
+            maca = new Maca(W, W, context);
+
+            logs[0].innerText = cobrinha.corpo.length;
+            logs[1].innerText = record;
+        }
+
+        function processarJogo() {
+            cobrinha.atualizar();
+
+            if (cobrinha.colidiuCom(maca)) {
+                cobrinha.corpo.push(
+                    {
+                        x: -W,
+                        y: -W,
+                        w: W,
+                        h: W
+                    }
+                );
+
+                maca = new Maca(W, W, context);
+
+                logs[0].innerText = cobrinha.corpo.length;
+
+                if (cobrinha.corpo.length > record) {
+                    record = cobrinha.corpo.length;
+                    logs[1].innerText = record;
+                    localStorage.setItem("record-cobrinha", record);
+                }
+            }
+
+            for (let i = 2; i < cobrinha.corpo.length; i++) {
+                if (cobrinha.colidiuCom(cobrinha.corpo[i])) {
+                    estadoAtual = MORREU;
+                }
+            }
+
+            if (cobrinha.corpo[0].x < 0) {
+                cobrinha.corpo[0].x = canvas.width - W;
+            }
+
+            if (cobrinha.corpo[0].y < 0) {
+                cobrinha.corpo[0].y = canvas.height - W;
+            }
+
+            if (cobrinha.corpo[0].x + cobrinha.corpo[0].w > canvas.width) {
+                cobrinha.corpo[0].x = 0;
+            }
+
+            if (cobrinha.corpo[0].y + cobrinha.corpo[0].h > canvas.height) {
+                cobrinha.corpo[0].y = 0;
+            }
+        }
+
+        function processarMorte() {
+            movendoParaEsquerda = false;
+            movendoParaCima = false;
+            movendoParaDireita = false;
+            movendoParaBaixo = false;
+        }
+
+        function renderizar() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            cobrinha.desenhar();
+
+            maca.desenhar();
+        }
+
+        function pausarPor(ms) {
+            const t0 = new Date().getTime();
+            let t = new Date().getTime();
+
+            while (t - t0 < ms) {
+                t = new Date().getTime();
+            }
+        }
+    </script>
+
+    <script id="classes">
+        class Cobrinha {
+            constructor(x, y, w, h, context) {
+                this.x = x;
+                this.y = y;
+                this.w = w;
+                this.h = h;
+                this.v = this.w;
+                this.corpo = [
+                    {
+                        x: this.x,
+                        y: this.y,
+                        w: this.w,
+                        h: this.h
+                    }
+                ],
+                    this.ctx = context;
+            }
+
+            atualizar() {
+                if (movendoParaEsquerda) {
+                    this._arrastar(-this.v, 0);
+                } else if (movendoParaCima) {
+                    this._arrastar(0, -this.v);
+                } else if (movendoParaDireita) {
+                    this._arrastar(this.v, 0);
+                } else if (movendoParaBaixo) {
+                    this._arrastar(0, this.v);
+                }
+            }
+
+            desenhar() {
+                this.ctx.save();
+                this.ctx.strokeStyle = "#666";
+
+                this.ctx.fillStyle = "#fff";
+                for (let i = this.corpo.length - 1; i > 0; i--) {
+                    this.ctx.fillRect(this.corpo[i].x, this.corpo[i].y, this.corpo[i].w, this.corpo[i].h);
+                    this.ctx.strokeRect(this.corpo[i].x, this.corpo[i].y, this.corpo[i].w, this.corpo[i].h);
+                }
+
+                this.ctx.fillStyle = "#666";
+                this.ctx.fillRect(this.corpo[0].x, this.corpo[0].y, this.corpo[0].w, this.corpo[0].h);
+                this.ctx.strokeRect(this.corpo[0].x, this.corpo[0].y, this.corpo[0].w, this.corpo[0].h);
+
+                this.ctx.restore();
+            }
+
+            colidiuCom(elemento) {
+                return this.corpo[0].x == elemento.x &&
+                    this.corpo[0].y == elemento.y;
+            }
+
+            _arrastar(vx, vy) {
+                this.corpo.unshift(
+                    {
+                        x: this.corpo[0].x + vx,
+                        y: this.corpo[0].y + vy,
+                        w: this.w,
+                        h: this.h
+                    }
+                );
+                this.corpo.pop();
+            }
+        }
+
+        class Maca {
+            constructor(w, h, context) {
+                const numCelulasX = context.canvas.width / w;
+                const numCelulasY = context.canvas.height / h;
+                this.x = w + w * Math.floor(Math.random() * (numCelulasX - 2));
+                this.y = h + h * Math.floor(Math.random() * (numCelulasY - 2));
+                this.w = w;
+                this.h = h;
+                this.ctx = context;
+            }
+
+            desenhar() {
+                this.ctx.save();
+                this.ctx.fillStyle = "#f00";
+                this.ctx.strokeStyle = "#fff";
+                this.ctx.fillRect(this.x, this.y, this.w, this.h);
+                this.ctx.strokeRect(this.x, this.y, this.w, this.h);
+                this.ctx.restore();
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="container">
+        <h1>Jogo da Cobrinha</h1>
+        <canvas id="canvas" width="360" height="400"></canvas>
+        <h3>Tamanho: <span id="spnTamanho"></span> Record: <span id="spnRecord"></span></h3>
+        <div id="botoes">
+            <div id="horizontais">
+                <button id="btEsquerda">Esquerda</button>
+                <button id="btDireita">Direita</button>
+            </div>
+            <div id="verticais">
+                <button id="btCima">Cima</button>
+                <button id="btBaixo">Baixo</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const btEsquerda = document.querySelector("#btEsquerda");
+        const btDireita = document.querySelector("#btDireita");
+        const btCima = document.querySelector("#btCima");
+        const btBaixo = document.querySelector("#btBaixo");
+        logs[0] = document.querySelector("#spnTamanho");
+        logs[1] = document.querySelector("#spnRecord");
+
+        btEsquerda.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            if (!movendoParaDireita) {
+                movendoParaEsquerda = true;
+            }
+
+            movendoParaCima = false;
+            movendoParaBaixo = false;
+
+        });
+
+        btCima.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            if (!movendoParaBaixo) {
+                movendoParaCima = true;
+            }
+
+            movendoParaEsquerda = false;
+            movendoParaDireita = false;
+
+        });
+
+        btDireita.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            if (!movendoParaEsquerda) {
+                movendoParaDireita = true;
+            }
+
+            movendoParaCima = false;
+            movendoParaBaixo = false;
+
+        });
+
+        btBaixo.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            if (!movendoParaCima) {
+                movendoParaBaixo = true;
+            }
+
+            movendoParaEsquerda = false;
+            movendoParaDireita = false;
+
+        });
+
+        canvas = document.querySelector("#canvas");
+        context = canvas.getContext("2d");
+
+        setInterval(iniciarJogo, 200);
+    </script>
+</body>
+
+</html>
