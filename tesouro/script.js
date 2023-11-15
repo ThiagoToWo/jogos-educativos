@@ -1,7 +1,7 @@
 //==========================================variáveis globais============================================//
 
 // elementos html
-const quadrante = document.querySelector("#quadrante");
+const coordenada = document.querySelector("#coordenada");
 const tesouros = document.querySelector("#tesouros");
 const vida = document.querySelector("#vida");
 const radar = document.querySelector("#radar");
@@ -81,7 +81,7 @@ function imprimirMapa(l, c) {
         cameraX = 0;
     }
 
-    if (cameraX + alturaCam >= max_lin) {
+    if (cameraX + alturaCam > max_lin) {
         cameraX = max_lin - alturaCam;
     }
 
@@ -89,7 +89,7 @@ function imprimirMapa(l, c) {
         cameraY = 0;
     }
 
-    if (cameraY + larguraCam >= max_col) {
+    if (cameraY + larguraCam > max_col) {
         cameraY = max_col - larguraCam;
     }
 
@@ -99,8 +99,8 @@ function imprimirMapa(l, c) {
                 case VAZIO: // caminho
                 case ARMADILHA: // armadilha
                 case TESOURO: display += " "; break; // tesouro						
-                case PAREDE: display += "<font style='color: black'>&clubs;</font>"; break; // parede
-                case PERSONAGEM: display += "<font style='color: red'>&#9786;</font>"; // personagem
+                case PAREDE: display += "<font style='color: black'>#;</font>"; break; // parede
+                case PERSONAGEM: display += "<font style='color: red'>@</font>"; // personagem
             }
         }
 
@@ -108,7 +108,7 @@ function imprimirMapa(l, c) {
     }
 
     pre.innerHTML = display;
-    quadrante.innerHTML = `(${c}, ${l})`;
+    coordenada.innerHTML = `(${c}, ${l})`;
     calcularTemperatura(linha, coluna);
 }
 
