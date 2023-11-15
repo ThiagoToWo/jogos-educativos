@@ -99,7 +99,7 @@ function imprimirMapa(l, c) {
                 case VAZIO: // caminho
                 case ARMADILHA: // armadilha
                 case TESOURO: display += " "; break; // tesouro						
-                case PAREDE: display += "<font style='color: black'>#;</font>"; break; // parede
+                case PAREDE: display += "<font style='color: black'>#</font>"; break; // parede
                 case PERSONAGEM: display += "<font style='color: red'>@</font>"; // personagem
             }
         }
@@ -302,8 +302,8 @@ function moverBaixo() {
 
 function disponibilizarControles() {
     if ("ontouchstart" in window) { // se for mobile
-		document.querySelector(".teclado").style.display = "none";
-	} else { // se não for mobile      
+	    document.querySelector(".teclado").style.display = "none";
+    } else { // se não for mobile      
 		document.querySelector(".botoes").style.display = "none";
         document.body.style.fontSize = "25px";
         pre.style.fontSize = "30px";
