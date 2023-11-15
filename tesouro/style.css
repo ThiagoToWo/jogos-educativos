@@ -1,6 +1,8 @@
-/*aplica opcionalmente as propriedades padrões*/
 body {
     background-color: rgb(127, 225, 255);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .infos {
@@ -12,28 +14,20 @@ span {
     margin-right: 5px;
 }
 
-.controles {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, 50%);
-}
-
 pre {
-    position: absolute;
-    line-height: 26px;
-    font-size: 30px;
+    line-height: 0.7em;
+    font-size: 20px;
     padding: 2px;
-    width: auto;
-    overflow: hidden;
+    width: fit-content;
     border: solid blue;
     background-color: azure;
 }
 
 .botao-grande {
-    width: 100px;
-    height: 100px;
-    font-size: 75px;
+    width: 80px;
+    height: 80px;
+    font-size: 2em;
+    margin: 10px;
 }
 
 .oculto {
@@ -44,66 +38,6 @@ pre {
     display: inline;
 }
 
-/*para telas orientação retrato de 993px até 1024px de largura*/
-@media (max-device-width: 1024px) {
-    .teclado {
-        display: none;
-    }
-}
-
-/*para telas orientação retrato de 541px até 992px de largura*/
-@media (max-device-width: 991px) {}
-
-/*para telas orientação retrato de 3911px até 540px de largura*/
-@media (max-device-width: 540px) {
-    .controles {
-        top: 110%;
-        transform: translate(-25%, -50%);
-    }
-}
-
-/*para telas orientação retrato de 321px até 390px de largura*/
-@media (max-device-width: 390px) {
-    .controles {
-        top: 120%;
-        transform: translate(-25%, -50%);
-    }
-}
-
-/*para telas orientação retrato até 320px de largura*/
-@media (max-device-width: 320px) {
-    .infos {
-        line-height: normal;
-    }
-
-    .controles {
-        transform: translate(-10%, 0%);
-    }
-}
-
-/*para orientação paisagem ou para telas maiores que 1024px de largura */
-@media (orientation: landscape),
-(min-device-width: 1024px) {
-    body {
-        text-align: center;
-    }
-
-    .infos {
-        line-height: 40%;
-    }
-
-    pre {
-        position: absolute;
-        top: 55%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-
-    .controles {
-        top: 85%;
-    }
-
-    .botoes {
-        display: none;
-    }
+.negrito {
+    font-weight: bold;
 }

@@ -1,48 +1,49 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
 	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="style.css">
 	<title>Caça-Tesouro (ASCII)</title>
 </head>
-
 <body>
-	<div class="infos">
-		<h1>Caça ao Tesouro - ascii</h1>
-		<h3>Topo do quadrante: <span id="quadrante">(0, 0)</span></h3>
-		<h3>Tesouros encontrados:
-			<span id="tesouros"></span>
-			<button id="novo1" class="oculto">Novo Jogo</button>
-		</h3>
-		<h3>Pontos de vida:
-			<span id="vida">&#10084;&#65039; &#10084;&#65039; &#10084;&#65039; &#10084;&#65039;</span>
-			<button id="novo2" class="oculto">Novo Jogo</button>
-		</h3>
-		<h3 id="radar">Temperatura: </h3>
-	</div>
-	<pre></pre>
-	<div class="controles">
-		<h3 class="teclado">Use as teclas direcionais do teclado para mover o personagem</h3>
-		<table class="botoes">
-			<tr>
-				<td>
-				<td><button id="u" class="botao-grande">&uarr;</button>
-				<td>
-			<tr>
-				<td><button id="l" class="botao-grande">&larr;</button>
-				<td>
-				<td><button id="r" class="botao-grande">&rarr;</button>
-			<tr>
-				<td>
-				<td><button id="d" class="botao-grande">&darr;</button>
-				<td>
-		</table>
+	<div id="tudo">
+		<div class="infos">
+			<h1>Caça ao Tesouro - ascii</h1>
+			<p class="negrito">Topo do quadrante: <span id="quadrante">(0, 0)</span></p>
+			<p class="negrito">Tesouros encontrados:
+				<span id="tesouros"></span>
+				<button id="novo1" class="oculto">Novo Jogo</button>
+			</p>
+			<p class="negrito">Pontos de vida:
+				<span id="vida">&#10084;&#65039; &#10084;&#65039; &#10084;&#65039; &#10084;&#65039;</span>
+				<button id="novo2" class="oculto">Novo Jogo</button>
+			</p>
+			<p id="radar" class="negrito">Temperatura: </p>
+		</div>
+		<pre></pre>
+		<div class="controles">
+			<table class="botoes">
+				<tr>
+					<td></td>
+					<td><button id="u" class="botao-grande">&uarr;</button></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><button id="l" class="botao-grande">&larr;</button></td>
+					<td></td>
+					<td><button id="r" class="botao-grande">&rarr;</button></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><button id="d" class="botao-grande">&darr;</button></td>
+					<td></td>
+				</tr>
+			</table>
+			<p class="teclado">Use as teclas direcionais do teclado para mover o personagem.</p>
+		</div>
 	</div>
 
 	<script src="script.js"></script>
 </body>
-
 </html>

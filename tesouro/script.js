@@ -16,6 +16,10 @@ const btD = document.querySelector("#d");
 const mapa = []; // matriz mapa
 const max_lin = 32; // limite máximo de linhas da matriz
 const max_col = 64; // limite máximo de colunas da matriz
+const larguraCam = 20; // largura da câmera que acompanha o personagem
+const alturaCam = 10; // altura da câmera que acompanha o personagem
+let cameraX; // coordenada x do canto superior esquerdo da câmera
+let cameraY; // coordenada y do canto superior esquerdo da câmera
 let linha = 0; // linha posição do personagem
 let coluna = 0; // coluna posição do personagem
 const VAZIO = 0; // flag dos espaços caminháveis
@@ -62,15 +66,35 @@ btNovo2.addEventListener("click", () => {
     location.reload();
 });
 
+// detectar dispositivo mobile
+window.addEventListener("load", disponibilizarControles);
+
 //==========================================funções úteis============================================//
 
 function imprimirMapa(l, c) {
-    const qx = l > max_lin / 2 - 1 ? 16 : 0;
-    const qy = c > max_col / 2 - 1 ? 32 : 0;
+    cameraX = l - alturaCam / 2;
+    cameraY = c - larguraCam / 2;
     let display = "";
 
-    for (let i = qx; i < qx + max_lin / 2; i++) {
-        for (let j = qy; j < qy + max_col / 2; j++) {
+    // trata sobre a colisão da câmera com os limites do jogo
+    if (cameraX < 0) {
+        cameraX = 0;
+    }
+
+    if (cameraX + alturaCam >= max_lin) {
+        cameraX = max_lin - alturaCam;
+    }
+
+    if (cameraY < 0) {
+        cameraY = 0;
+    }
+
+    if (cameraY + larguraCam >= max_col) {
+        cameraY = max_col - larguraCam;
+    }
+
+    for (let i = cameraX; i < cameraX + alturaCam; i++) {
+        for (let j = cameraY; j < cameraY + larguraCam; j++) {
             switch (mapa[i][j]) {
                 case VAZIO: // caminho
                 case ARMADILHA: // armadilha
@@ -84,7 +108,7 @@ function imprimirMapa(l, c) {
     }
 
     pre.innerHTML = display;
-    quadrante.innerHTML = `(${qx}, ${qy})`;
+    quadrante.innerHTML = `(${c}, ${l})`;
     calcularTemperatura(linha, coluna);
 }
 
@@ -274,4 +298,14 @@ function moverBaixo() {
     }
 
     imprimirMapa(linha, coluna);
+}
+
+function disponibilizarControles() {
+    if ("ontouchstart" in window) { // se for mobile
+		document.querySelector(".teclado").style.display = "none";
+	} else { // se não for mobile      
+		document.querySelector(".botoes").style.display = "none";
+        document.body.style.fontSize = "25px";
+        pre.style.fontSize = "30px";
+    }
 }
