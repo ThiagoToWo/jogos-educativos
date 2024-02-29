@@ -5,8 +5,11 @@ const form = document.querySelector("form");
 const resp1 = document.querySelector("#f");
 const resp2 = document.querySelector("#T");
 const resp3 = document.querySelector("#l");
+const resp4 = document.querySelector("#tReal");
 let elementos;
 let acao;
+let tReal;
+let contandoTempo;
 
 /*=====================================Funções de Formulário====================================*/
 form.addEventListener("submit", (e) => {
@@ -32,7 +35,6 @@ form.addEventListener("submit", (e) => {
     resp2.innerText = `Período Médio entre Colisões (T) = ${T.toPrecision(5)} s`;
     resp3.innerText = `Livre Percurso Médio (l) = ${l.toPrecision(5)} cm`;
 
-    // Cria e insere a bola vermelha nos elementos
     let x = d / 2 + Math.random() * (canvas.width - d);
     let y = d / 2 + Math.random() * (canvas.height - d);
     let vx = Math.pow(-1, Math.floor(Math.random() * 10)) * Math.random() * v;
@@ -40,7 +42,6 @@ form.addEventListener("submit", (e) => {
     let p = new Particula(x, y, d/2, vx, vy, "red", ctx);
     elementos = [p];
 
-    // Cria e insere as outras N - 1 bolas pretas nos elementos
     for (let i = 0; i < N - 1; i++) {
         x = d / 2 + Math.random() * (canvas.width - d);
         y = d / 2 + Math.random() * (canvas.height - d);
@@ -49,6 +50,9 @@ form.addEventListener("submit", (e) => {
         p = new Particula(x, y, d/2, vx, vy, "black", ctx);
         elementos.push(p);
     }
+
+    tReal = 0;
+    contandoTempo = true;
 
     if (refletiu) { // processamento com reflexão
         acao = setInterval(() => { processarTudo(refletir) }, 100);
@@ -74,6 +78,7 @@ form.addEventListener("reset", () => {
     resp1.innerText = "";
     resp2.innerText = "";
     resp3.innerText = "";
+    resp4.innerText = "";
 });
 
 /*=====================================Funções de Processamento====================================*/
@@ -89,6 +94,13 @@ function processarTudo(callback) {
                 callback(elementos[i], elementos[j]);
             }
         }
+    }
+
+    
+    if (contandoTempo) {
+        tReal += 0.1;
+        resp4.innerText = `Tempo Real de Experiência = ${tReal.toPrecision(5)} s`;
+        if (elementos.length == 1) contandoTempo = false;
     }
 }
 
@@ -109,13 +121,11 @@ function fundir(a, b) {
         a.vx = vx;
         a.vy = vy;
         a.r = Math.sqrt(a.r * a.r + b.r * b.r);
-        b.ativo = false;
-        b.x = 1500;
+        elementos.splice(elementos.indexOf(b), 1);
     } else {
         b.vx = vx;
         b.vy = vy;
         b.r = Math.sqrt(a.r * a.r + b.r * b.r);
-        a.ativo = false;
-        a.x = 1500;
+        elementos.splice(elementos.indexOf(a), 1);
     }
 }

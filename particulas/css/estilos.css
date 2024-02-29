@@ -1,8 +1,6 @@
-body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+/*body {
+    text-align: center;
+}*/
 
 canvas {
     border-style: solid;

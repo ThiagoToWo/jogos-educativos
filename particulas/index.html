@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livre Percurso Médio</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+    <h1>Colisão entre Patículas</h1>
+    <form>
+        <p>N° de Partículas (N): <input type="number" id="N" min="2" max="1000" value="10" required></p>
+        <p>Aresta ([a] = cm): <input type="number" id="a" min="1" max="300" value="300" required></p>
+        <p>Diâmetro das Partícula ([d] = cm): <input type="number" id="d" min="1" max="40" step="0.5" value="10"
+                required></p>
+        <p>Velocidade das Partícula ([v] = cm/s): <input type="number" id="v" min="0.5" max="150" step="0.5" value="5"
+                required></p>
+        <p>
+            <input type="radio" name="efeito" id="refletir" checked required> Refletir
+            <input type="radio" name="efeito" id="fundir" required> Fundir
+            <input type="radio" name="efeito" id="browniano" required> Mov. Browniano
+        </p>
+        <p>
+            <input type="submit" value="Processar">
+            <input type="reset" value="Reiniciar">
+        </p>
+    </form>
+    <canvas width="300" height="300"></canvas>
+    <h4>Fórmulas:</h4>
+    <ul>
+        <li>f = &pi;nvd²&radic;2, com n = N / a²</li>
+        <li>T = 1 / f</li>
+        <li>l = vT</li>
+    </ul>
+    <pre id="f"></pre>
+    <pre id="T"></pre>
+    <pre id="l"></pre>
+    <pre id="tReal"></pre>
+    <script src="js/Particula.js"></script>
+    <script src="js/script.js"></script>
+</body>
+
+</html>
