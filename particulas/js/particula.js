@@ -60,9 +60,9 @@ class Particula {
         if (!this.ativoColidir) return;
         if (!this.ativo) return;
 
-        return (this.x + this.r >= outro.x - outro.r) &&
-            (this.x - this.r <= outro.x + outro.r) &&
-            (this.y + this.r >= outro.y - outro.r) &&
-            (this.y - this.r <= outro.y + outro.r);
+        const dx = this.x - outro.x;
+        const dy = this.y - outro.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        return d <= this.r + outro.r;
     }
 }
