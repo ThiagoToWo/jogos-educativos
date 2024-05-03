@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mar de Árvores</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #acc7a3;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        p {
+            margin-left: 10px;
+        }
+
+        #estagio {
+            width: fit-content;
+            font-size: 20px;
+            line-height: 16px;
+            color: #060;
+            border: 1px solid #000;
+            border-radius: 5px;
+            margin: 0 auto;
+            background: -webkit-radial-gradient(center, circle #fff, #000 50%);
+            background: radial-gradient(center, circle, #fff, #000 50%);
+        }
+
+        table {
+            margin: 0 auto;
+        }
+
+        .butao-grande {
+            width: 80px;
+            height: 80px;
+            font-size: 50px;
+            margin: 20px;
+        }
+
+        button,
+        .butao-grande {
+            border: 2px solid #000;
+            border-radius: 10px;
+            background: -webkit-linear-gradient(top, #a3a3a3, #000);
+            background: linear-gradient(top, #a3a3a3, #000);
+            color: #fff;
+            box-shadow: 5px 5px 3px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        button:hover,
+        .butao-grande:hover {
+            background: -webkit-linear-gradient(top, #acc7a3, #506651);
+            background: linear-gradient(top, #acc7a3, #506651);
+            box-shadow: 5px 5px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        button:active,
+        .butao-grande:active {
+            background: -webkit-linear-gradient(top, #858565, #c5c9a9);
+            background: linear-gradient(top, #858565, #c5c9a9);
+            box-shadow: 0px 0px;
+        }
+
+        .negrito {
+            font-weight: bolder;
+        }
+
+        .oculto {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="tudo">
+        <h1>Mar de Árvores</h1>
+        <p>
+            Encontre um caminho para sair da floresta sombria.
+            Marque seu caminho com a fita vermelha.
+            Alguns espíritos tentarão te impedir.
+        </p>
+        <p class="negrito">
+            Coordenadas (x, y) = <span id="coordenadas"></span>
+            <button id="btNovoMapa">Novo Mapa</button>
+        </p>
+        <pre id="estagio"></pre>
+        <table>
+            <tr>
+                <td></td>
+                <td><button id="btCima" class="butao-grande">&uparrow;</button></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><button id="btEsquerda" class="butao-grande">&leftarrow;</button></td>
+                <td></td>
+                <td><button id="btDireita" class="butao-grande">&rightarrow;</button></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button id="btBaixo" class="butao-grande">&downarrow;</button></td>
+                <td></td>
+            </tr>
+        </table>
+        <p id="aviso" class="oculto">Mova o mapa para ver todas as áreas</p>
+    </div>
+
+    <script>
+        const coordenadas = document.querySelector("#coordenadas"); // span com as coordenadas do personagem
+        const btNovoMapa = document.querySelector("#btNovoMapa") // botão de reiniciar
+        const estagio = document.querySelector("#estagio"); // pre para renderização do mapa
+        const btEsquerda = document.querySelector("#btEsquerda"); // botão para mover o personagem para esquerda
+        const btCima = document.querySelector("#btCima"); // botão para mover o personagem para cima
+        const btDireita = document.querySelector("#btDireita"); // botão para mover o personagem para direita
+        const btBaixo = document.querySelector("#btBaixo"); // botão para mover o personagem para baixo
+        const mapa = []; // matriz com as informações do mapa
+        const LARGURA_MAPA = 200; // número de colunas do mapa
+        const ALTURA_MAPA = 200; // número de linhas do mapa
+        let LARGURA_CAM = 20; // número de colunas representadas na tela
+        let ALTURA_CAM = 10; // número de linhas representadas na tela
+        const FREQ_ARVORES = 0.4; // probabilidade de árvores no mapa
+        // elementos do jogo
+        const PERSONAGEM = 1;
+        const ARVORE = 2;
+        const VAZIO = 3;
+        const RASTRO = 4;
+        const MONSTRO = 5;
+        const MORTO = 6;
+        const NUM_MONSTROS = 50; // quantidade de monstros
+        const monstros = []; // lista para guardar os monstros
+        // possíveis direções de movimentação dos monstros
+        const DIR_NENHUMA = 0;
+        const DIR_ESQUERDA = 1;
+        const DIR_CIMA = 2;
+        const DIR_DIREITA = 3;
+        const DIR_BAIXO = 4;
+        let direcao; // guarda a direção calculada do movimanto do monstro
+        //posição inicial do personagem
+        let x = Math.floor(LARGURA_MAPA / 2);
+        let y = Math.floor(ALTURA_MAPA / 2);
+        // guarda as coordenadas da câmera
+        let cameraX;
+        let cameraY;
+
+        preencherMapa();
+        renderizar();
+        window.addEventListener("keydown", mover);
+
+        btCima.addEventListener("click", moverParaCima);
+        btEsquerda.addEventListener("click", moverParaEsquerda);
+        btDireita.addEventListener("click", moverParaDireita);
+        btBaixo.addEventListener("click", moverParaBaixo);
+
+        btNovoMapa.addEventListener("click", function () {
+            window.location.reload();
+        });
+
+        //*******************Funções******************//
+        function preencherMapa() {
+            for (let i = 0; i < ALTURA_MAPA; i++) {
+                const linha = [];
+                for (let j = 0; j < LARGURA_MAPA; j++) {
+                    if ( // coloca vazio ou árvore
+                        Math.random() < FREQ_ARVORES &&
+                        i >= 1 && i < ALTURA_MAPA - 1 &&
+                        j >= 1 && j < LARGURA_MAPA - 1
+                    ) {
+                        linha[j] = ARVORE
+                    } else {
+                        linha[j] = VAZIO;
+                    }
+                }
+
+                mapa[i] = linha;
+            }
+
+            mapa[y][x] = PERSONAGEM; // localiza o personagem
+
+            for (let i = 0; i < NUM_MONSTROS; i++) { // preenche a lista de monstros
+                monstro = {
+                    x: Math.floor(Math.random() * LARGURA_MAPA),
+                    y: Math.floor(Math.random() * ALTURA_MAPA),
+                    vx: 0,
+                    vy: 0,
+                    direcoesValidas: []
+                }
+
+                monstros.push(monstro);
+            }
+
+            moverMonstros(monstros); // localiza os monstros
+        }
+
+        function renderizar() {
+            let mostra = "";
+            // calcula a posição da câmera
+            cameraX = Math.floor(x - LARGURA_CAM / 2);
+            cameraY = Math.floor(y - ALTURA_CAM / 2);
+
+            // trata a colisão da câmera com os limites do mapa
+            if (cameraX < 0) {
+                cameraX = 0;
+            }
+
+            if (cameraX + LARGURA_CAM >= LARGURA_MAPA) {
+                cameraX = LARGURA_MAPA - LARGURA_CAM;
+            }
+
+            if (cameraY < 0) {
+                cameraY = 0;
+            }
+
+            if (cameraY + ALTURA_CAM >= ALTURA_MAPA) {
+                cameraY = ALTURA_MAPA - ALTURA_CAM;
+            }            
+
+            // imprime os símbolos de cada elemento do mapa
+            for (let i = cameraY; i < cameraY + ALTURA_CAM; i++) {
+                for (let j = cameraX; j < cameraX + LARGURA_CAM; j++) {
+                    switch (mapa[i][j]) {
+                        case PERSONAGEM: mostra += "<font style='color:#f00'>i</font>"; break;
+                        case ARVORE: mostra += "#"; break;
+                        case VAZIO: mostra += " "; break;
+                        case RASTRO: mostra += "<font style='color:#f00'>*</font>"; break;
+                        case MONSTRO: mostra += "<font style='color:#000'>T</font>"; break;
+                        case MORTO: mostra += "<font style='color:#f00'>X</font>"; break;
+                    }
+                }
+                mostra += "\n";
+            }
+
+            estagio.innerHTML = mostra;
+            coordenadas.innerText = `(${x}, ${y})`; // atualiza as coordenadas do personagem
+        }
+
+        function mover(evento) { // para uso do teclado
+            const tecla = evento.key;
+
+            switch (tecla) {
+                case "ArrowLeft":
+                case "a": moverParaEsquerda(); break;
+                case "ArrowUp":
+                case "w": moverParaCima(); break;
+                case "ArrowRight":
+                case "d": moverParaDireita(); break;
+                case "ArrowDown":
+                case "s": moverParaBaixo(); break;
+            }            
+        }
+
+        function moverParaEsquerda() {
+            if (x - 1 >= 0 && mapa[y][x - 1] != ARVORE) {
+                mapa[y][x] = RASTRO;
+                x--;
+                
+                // se você avançou em um monstro
+                if (mapa[y][x] == MONSTRO) {
+                    mapa[y][x] = MORTO;
+                    finalizar();
+                } else if (x == 0) { // se saiu da floresta
+                    mapa[y][x] = PERSONAGEM;
+                    finalizar();
+                } else { // se não avançou no monstrou e não saiu da floresta
+                    mapa[y][x] = PERSONAGEM;
+                    const meAtacou = moverMonstros(monstros);
+                    
+                    if (meAtacou) { // se o monstro te avançar
+                        mapa[y][x] = MORTO;
+                        finalizar();
+                    } else { // se não te avançar
+                        renderizar();
+                    }
+                }
+            }
+        }
+
+        function moverParaCima() {
+            if (y - 1 >= 0 && mapa[y - 1][x] != ARVORE) {
+                mapa[y][x] = RASTRO;
+                y--;
+                
+                // se você avançou em um monstro
+                if (mapa[y][x] == MONSTRO) {
+                    mapa[y][x] = MORTO;
+                    finalizar();
+                } else if (y == 0) { // se saiu da floresta
+                    mapa[y][x] = PERSONAGEM;
+                    finalizar();
+                } else { // se não avançou no monstrou e não saiu da floresta
+                    mapa[y][x] = PERSONAGEM;
+                    const meAtacou = moverMonstros(monstros);
+                    
+                    if (meAtacou) { // se o monstro te avançar
+                        mapa[y][x] = MORTO;
+                        finalizar();
+                    } else { // se não te avançar
+                        renderizar();
+                    }
+                }
+            }
+        }
+
+        function moverParaDireita() {
+            if (x + 1 < LARGURA_MAPA && mapa[y][x + 1] != ARVORE) {
+                mapa[y][x] = RASTRO;
+                x++;
+                
+                // se você avançou em um monstro
+                if (mapa[y][x] == MONSTRO) {
+                    mapa[y][x] = MORTO;
+                    finalizar();
+                } else if (x == LARGURA_MAPA - 1) { // se saiu da floresta
+                    mapa[y][x] = PERSONAGEM;
+                    finalizar();
+                } else { // se não avançou no monstrou e não saiu da floresta
+                    mapa[y][x] = PERSONAGEM;
+                    const meAtacou = moverMonstros(monstros);
+                    
+                    if (meAtacou) { // se o monstro te avançar
+                        mapa[y][x] = MORTO;
+                        finalizar();
+                    } else { // se não te avançar
+                        renderizar();
+                    }
+                }
+            }
+        }
+
+        function moverParaBaixo() {
+            if (y + 1 < ALTURA_MAPA && mapa[y + 1][x] != ARVORE) {
+                mapa[y][x] = RASTRO;
+                y++;
+                
+                // se você avançou em um monstro
+                if (mapa[y][x] == MONSTRO) {
+                    mapa[y][x] = MORTO;
+                    finalizar();
+                } else if (y == ALTURA_MAPA - 1) { // se saiu da floresta
+                    mapa[y][x] = PERSONAGEM;
+                    finalizar();
+                } else { // se não avançou no monstrou e não saiu da floresta
+                    mapa[y][x] = PERSONAGEM;
+                    const meAtacou = moverMonstros(monstros);
+                    
+                    if (meAtacou) { // se o monstro te avançar
+                        mapa[y][x] = MORTO;
+                        finalizar();
+                    } else { // se não te avançar
+                        renderizar();
+                    }
+                }
+            }            
+        }
+
+
+        // funções de controle dos inimigos
+        function moverMonstros(monstros) {
+            for (const monstro of monstros) { // para cada monstro da lista
+                // calcula a posição do monstro somando suas velocidades
+                mapa[monstro.y][monstro.x] = VAZIO;
+                monstro.x += monstro.vx;
+                monstro.y += monstro.vy;
+
+                // trata a colisão do monstro com os limites do mapa
+                if (monstro.x < 0) {
+                    monstro.x = 0;
+                }
+
+                if (monstro.x >= LARGURA_MAPA) {
+                    monstro.x = LARGURA_MAPA - 1;
+                }
+
+                if (monstro.y < 0) {
+                    monstro.y = 0;
+                }
+
+                if (monstro.y >= ALTURA_MAPA) {
+                    monstro.y = ALTURA_MAPA - 1;
+                }
+
+                // atualiza a posição do monstro
+                mapa[monstro.y][monstro.x] = MONSTRO;
+
+                // se o monstro me avançar
+                if (mapa[y][x] == MONSTRO) {
+                    return true;
+                }
+
+                mudarDirecao(monstro); // calcula as futuras direções do monstro
+            }
+
+            return false; // se o monstro não me avançar
+        }
+
+        function mudarDirecao(monstro) {
+            // limpa o estado atual das direções do monstro
+            monstro.direcoesValidas = [];
+            direcao = DIR_NENHUMA;
+
+            // preenche as possíveis direções de movimento
+            if (monstro.x > 0) {
+                const coisaAEsquerda = mapa[monstro.y][monstro.x - 1];
+                if (coisaAEsquerda == VAZIO || coisaAEsquerda == PERSONAGEM || coisaAEsquerda == RASTRO) 
+                    monstro.direcoesValidas.push(DIR_ESQUERDA);
+            }
+
+            if (monstro.y > 0) {
+                const coisaAcima = mapa[monstro.y - 1][monstro.x];
+                if (coisaAcima == VAZIO  || coisaAcima == PERSONAGEM || coisaAcima == RASTRO)
+                    monstro.direcoesValidas.push(DIR_CIMA);
+            }
+
+            if (monstro.x < LARGURA_MAPA - 1) {
+                const coisaADireita = mapa[monstro.y][monstro.x + 1];
+                if (coisaADireita == VAZIO || coisaADireita == PERSONAGEM || coisaADireita == RASTRO)
+                    monstro.direcoesValidas.push(DIR_DIREITA);
+            }
+
+            if (monstro.y < ALTURA_MAPA - 1) {
+                const coisaAbaixo = mapa[monstro.y + 1][monstro.x];
+                if (coisaAbaixo == VAZIO || coisaAbaixo == PERSONAGEM || coisaAbaixo == RASTRO)
+                    monstro.direcoesValidas.push(DIR_BAIXO);
+            }
+
+            // se ele puder se mover para algum lugar
+            if (monstro.direcoesValidas.length != 0) {
+                // verifica se tem corredores ou becos
+                const passagemAcimaOuAbaixo = monstro.direcoesValidas.includes(DIR_CIMA) || monstro.direcoesValidas.includes(DIR_BAIXO);
+                const passagemAEsquerdaOuADireita = monstro.direcoesValidas.includes(DIR_ESQUERDA) || monstro.direcoesValidas.includes(DIR_DIREITA);
+                const becoSemSaida = monstro.direcoesValidas.length == 1;
+
+                // se corredores verticas se cruzam com horizontais ou ele está em um beco 
+                if (passagemAcimaOuAbaixo && passagemAEsquerdaOuADireita || becoSemSaida) {
+                    encontrarDirecaoMaisProxima(monstro); // encontra a direção que se aproxima do personagem
+
+                    // se não tem nenhuma direção que se aprixima, escolhe uma aleatória
+                    if (direcao == DIR_NENHUMA) {
+                        const random = Math.floor(Math.random() * monstro.direcoesValidas.length);
+                        direcao = monstro.direcoesValidas[random];
+                    }
+                }
+            }
+
+            // modifica os parâmetros de velocidade de acordo com a direção calculada
+            switch (direcao) {
+                case DIR_CIMA:
+                    monstro.vx = 0;
+                    monstro.vy = -1;
+                    break;
+                case DIR_ESQUERDA:
+                    monstro.vx = -1;
+                    monstro.vy = 0;
+                    break;
+                case DIR_BAIXO:
+                    monstro.vx = 0;
+                    monstro.vy = 1;
+                    break;
+                case DIR_DIREITA:
+                    monstro.vx = 1;
+                    monstro.vy = 0;
+                    break;
+            }
+        }
+
+        function encontrarDirecaoMaisProxima(monstro) {
+            let direcaoMaisProxima;
+
+            // calcula a direção que o monstro mais se aproxima do personagem
+            const dx = x - monstro.x;
+            const dy = y - monstro.y;
+
+            if (Math.abs(dx) >= Math.abs(dy)) {
+                if (dx <= 0) {
+                    direcaoMaisProxima = DIR_ESQUERDA;
+                } else {
+                    direcaoMaisProxima = DIR_DIREITA;
+                }
+            } else {
+                if (dy <= 0) {
+                    direcaoMaisProxima = DIR_CIMA;
+                } else {
+                    direcaoMaisProxima = DIR_BAIXO;
+                }
+            }
+
+            // verifica se essa direção é uma das válidas do monstro
+            for (let i = 0; i < monstro.direcoesValidas.length; i++) {
+                if (direcaoMaisProxima == monstro.direcoesValidas[i]) {
+                    direcao = direcaoMaisProxima;
+                }
+            }
+        }
+
+        function finalizar() {
+            LARGURA_CAM = LARGURA_MAPA;
+            ALTURA_CAM = ALTURA_MAPA;
+
+            document.querySelector("table").style.display = "none";
+            document.querySelector("#aviso").style.display = "block";
+            estagio.style.fontSize = "6px";
+            estagio.style.lineHeight = "4.8px";
+            estagio.style.width = "300px";
+            estagio.style.height = "400px";
+            estagio.style.overflow = "scroll";
+            estagio.style.background = "#ffd";
+
+            window.removeEventListener("keydown", mover);
+            renderizar();
+            estagio.scroll(200, 300);
+        }
+    </script>
+</body>
+
+</html>
